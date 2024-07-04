@@ -1,0 +1,243 @@
+substitutions:
+  devicename: gate
+  friendly_name: Gate
+
+esphome:
+  name: $devicename
+
+esp32:
+  board: esp32dev
+
+# Enable logging
+logger:
+#  baud_rate: 0
+
+web_server:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  platform: esphome
+  password: !secret ota_password
+#  password: "1cedf87abae9552f8c50d75ba031c374"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  domain: .home.dawes.za.net
+
+bluetooth_proxy:
+
+esp32_ble_tracker:
+
+output:
+  - platform: gpio
+    pin: GPIO2
+    id: ped_output
+  - platform: gpio
+    pin: GPIO16
+    id: frx_output
+  - platform: gpio
+    pin: GPIO18
+    id: trg_output
+
+button:
+  - platform: output
+    id: ped
+    name: "Pedestrian"
+    output: ped_output
+    duration: 1000ms
+  - platform: output
+    id: frx
+    name: "Free exit"
+    internal: true
+    output: frx_output
+    duration: 1000ms
+  - platform: output
+    id: trg
+    name: "Trigger"
+    internal: true
+    output: trg_output
+    duration: 1000ms
+
+# maintains an enumeration of possible states of the gate
+# this is the central authority on what is going on
+select:
+  - platform: template
+    id: gate_state_internal
+    internal: true
+    optimistic: true
+    options:
+      - Closed
+      - Opening
+      - Open
+      - Closing
+    set_action:
+      - lambda: |-
+          // Update the text sensor state
+          id(gate_state).publish_state(x);
+
+          // Update the cover state
+          if (x == "Opening") {
+            id(gate_cover).current_operation = COVER_OPERATION_OPENING;
+          } else if (x == "Closing") {
+            id(gate_cover).current_operation = COVER_OPERATION_CLOSING;
+          } else {
+            id(gate_cover).current_operation = COVER_OPERATION_IDLE;
+          }
+          id(gate_cover).publish_state();
+
+# The cover exposed to Home Assistant, representing the gate's motion
+cover:
+  - platform: template
+    id: gate_cover
+    name: "Gate"
+    device_class: gate
+    lambda: |-
+      // Only two valid states for this lambda, CLOSED or OPEN
+      if (id(gate_state_internal).state == "Closed") {
+        return COVER_CLOSED;
+      } else {
+        return COVER_OPEN;
+      }
+    open_action:
+      - script.execute: open_gate
+    close_action:
+      - script.execute: close_gate
+    stop_action:
+      - script.execute: stop_gate
+    optimistic: true
+
+sensor:
+# internal sensor used to present the timing of flashes
+# Not exposed to HA, but visible in Debug log events
+# positive numbers are ON, negative numbers are OFF
+  - platform: template
+    id: status_interval
+    internal: true
+    update_interval: never
+    name: "Gate LED Status update interval"
+
+  - platform: uptime
+    name: Uptime
+
+  - platform: wifi_signal
+    name: WiFi Signal
+    update_interval: 60s
+
+script:
+# Determines the state of the cover when the flashing stops
+# restart and delay essentially makes a timeout
+  - id: update_idle_state
+    mode: restart
+    then:
+      - delay: 2500ms
+      - lambda: !lambda |-
+          auto call = id(gate_state_internal).make_call();
+          if (id(led).state) {
+            call.set_option("Open");
+          } else {
+            call.set_option("Closed");
+          }
+          call.perform();
+
+# The FRX (free exit) signal always opens the gate, no matter what
+  - id: open_gate
+    mode: single
+    then:
+      - button.press: frx
+
+# stop the gate if it is moving
+  - id: stop_gate
+    mode: single
+    then:
+      if:
+        condition:
+          lambda: return id(gate_state_internal).state == "Opening" || id(gate_state_internal).state == "Closing";
+        then:
+          - button.press: trg
+          - delay: 1500ms
+
+# Close the gate if it is open or opening
+# NB: this doesn't adress the case where the gate was stopped while closing
+# but not yet fully closed.
+  - id: close_gate
+    mode: single
+    then:
+      - if:
+          condition:
+            lambda: return id(gate_state_internal).state == "Opening";
+          then:
+            - button.press: trg
+            - delay: 2s
+            - button.press: trg
+      - if:
+          condition:
+            lambda: return id(gate_state_internal).state == "Open";
+          then:
+            - button.press: trg
+
+text_sensor:
+  - id: gate_state
+    name: "Gate state"
+    platform: template
+
+  - platform: version
+    name: ESPHome Version
+  - platform: wifi_info
+    ip_address:
+      name: IP Address
+    ssid:
+      name: WiFi SSID
+    bssid:
+      name: WiFi BSSID
+
+switch:
+  - platform: restart
+    name: Restart
+
+binary_sensor:
+# attached to the status LED via an opto
+  - platform: gpio
+    pin: 
+      number: GPIO21
+      mode: input_pullup
+      inverted: true
+    id: led
+    on_state:
+      then:
+# Calculate the time since the last state change
+# "Flashes" longer than 3 seconds are considered static state/idle
+        - lambda: |-
+            static int last_toggle = 0;
+            int now = millis();
+            int interval = now - last_toggle;
+            if (now - last_toggle > 3000) {
+              interval = 0;
+            }
+            last_toggle = now;
+            id(status_interval).publish_state(x ? - interval : interval);
+
+            // eliminate outliers
+            if (interval < 75 || interval > 500)
+              return;
+
+            // determine direction based on flash intervals
+            // Slow opening flashes are approx 350-450ms
+            // Fast closing flashes are approx 100-150ms
+            // However, acceleration/deceleration does stretch out the durations
+
+            auto call = id(gate_state_internal).make_call();
+            if (interval > 350 && id(gate_state_internal).state == "Closed") {
+              call.set_option("Opening");
+              call.perform();
+            } else if (interval < 150 && id(gate_state_internal).state == "Open") {
+              call.set_option("Closing");
+              call.perform();
+            }
+
+        - script.execute: update_idle_state
+

@@ -1,0 +1,97 @@
+substitutions:
+  devicename: currentcost
+  upper_devicename: CurrentCost
+
+esphome:
+  name: ${devicename}
+  platform: esp32
+  board: esp32dev
+  platformio_options:
+    upload_speed: 460800
+    build_flags: -DRAPIDXML_STATIC_POOL_SIZE=1024 -DRAPIDXML_DYNAMIC_POOL_SIZE=1024
+    build_unflags: -fno-exceptions
+  includes:
+     - rapidxml
+     - currentcost.h
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  domain: !secret wifi_domain
+
+# Enable logging
+logger:
+  baud_rate: 0
+  level: VERBOSE
+
+web_server:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  platform: esphome
+  password: !secret ota_password
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+#bluetooth_proxy:
+
+#esp32_ble_tracker:
+
+text_sensor:
+  - platform: version
+    name: ${upper_devicename} ESPHome Version
+  - platform: wifi_info
+    ip_address:
+      name: ${upper_devicename} IP
+    ssid:
+      name: ${upper_devicename} SSID
+    bssid:
+      name: ${upper_devicename} BSSID
+
+switch:
+  - platform: restart
+    name: ${upper_devicename} Restart
+
+binary_sensor:
+  - platform: status
+    name: ${upper_devicename} Status
+
+sensor:
+  - platform: uptime
+    name: ${upper_devicename} uptime
+
+  - platform: wifi_signal
+    name: ${upper_devicename} WiFi Signal
+    update_interval: 60s
+
+  - platform: custom
+    lambda: |-
+      auto currentcost = new CurrentCostSensor(id(uart_bus));
+      App.register_component(currentcost);
+      return {currentcost->ch1, currentcost->ch2, currentcost->ch3};
+    sensors:
+      - id: "ch1"
+        name: "currentcost_ch1"
+        unit_of_measurement: W
+        accuracy_decimals: 0
+      - id: "ch2"
+        name: "currentcost_ch2"
+        unit_of_measurement: W
+        accuracy_decimals: 0
+      - id: "ch3"
+        name: "currentcost_ch3"
+        unit_of_measurement: W
+        accuracy_decimals: 0
+
+uart:
+  id: uart_bus
+  rx_pin: GPIO18
+  tx_pin: GPIO19
+  baud_rate: 57600
+  rx_buffer_size: 1024
+  debug:
+    direction: RX

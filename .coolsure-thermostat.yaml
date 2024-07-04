@@ -1,0 +1,266 @@
+substitutions:
+  devicename: thermostat1
+  upper_devicename: Thermostat 1
+
+esphome:
+  name: ${devicename}
+#  on_boot:
+#    then:
+#      - rtttl.play: 'MissionImp:d=16,o=6,b=95:32d,32d#,32d,32d#,32d,32d#,32d,32d#,32d,32d,32d#,32e,32f,32f#,32g,g,8p,g,8p,a#,p,c7,p,g,8p,g,8p,f,p,f#,p,g,8p,g,8p,a#,p,c7,p,g,8p,g,8p,f,p,f#,p,a#,g,2d,32p,a#,g,2c#,32p,a#,g,2c,a#5,8c,2p,32p,a#5,g5,2f#,32p,a#5,g5,2f,32p,a#5,g5,2e,d#,8d'
+
+esp8266:
+  board: esp8285
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "rqJ1sZ0vGkxA4bV5Bjbj44bYFV4njNHejMsBBZlvC0o="
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  domain: .home.dawes.za.net
+
+ota:
+  platform: esphome
+  password: !secret ota_password
+
+web_server:
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+i2c:
+  scan: true
+  id: i2c_a
+
+spi:
+  clk_pin: GPIO14
+  mosi_pin: GPIO13
+  miso_pin: GPIO12
+
+font:
+  - file: "gfonts://fonts/fontawesome-webfont.ttf"
+    id: my_font
+    size: 20
+
+display:
+  - platform: st7735
+    model: "INITR_GREENTAB"
+#    reset_pin: D4
+    cs_pin: GPIO15
+    dc_pin: GPIO2
+    rotation: 270
+    device_width: 128
+    device_height: 160
+    col_start: 0
+    row_start: 0
+    eight_bit_color: true
+    update_interval: 1s
+    id: my_display
+    pages:
+      - id: page1
+        lambda: |-
+          it.print(0, 10, id(my_font), "This is page 1!");
+      - id: page2
+        lambda: |-
+          it.print(0, 10, id(my_font), "This is page 2!");
+
+interval:
+  - interval: 5s
+    then:
+      - display.page.show_next: my_display
+      - component.update: my_display
+
+text_sensor:
+  - platform: version
+    name: ${upper_devicename} ESPHome Version
+  - platform: wifi_info
+    ip_address:
+      name: ${upper_devicename} IP
+    ssid:
+      name: ${upper_devicename} SSID
+    bssid:
+      name: ${upper_devicename} BSSID
+
+sensor:
+  - platform: uptime
+    name: ${upper_devicename} uptime
+
+  - platform: wifi_signal
+    name: ${upper_devicename} WiFi Signal
+    update_interval: 60s
+
+  - platform: adc
+    pin: A0
+    name: "Buttons"
+#    update_interval: 50ms
+    update_interval: 1s
+    internal: true
+    on_value_range:
+      - above: 0.99
+        then:
+          - binary_sensor.template.publish:
+              id: button_up
+              state: OFF
+          - binary_sensor.template.publish:
+              id: button_down
+              state: OFF
+          - binary_sensor.template.publish:
+              id: button_power
+              state: OFF
+          - binary_sensor.template.publish:
+              id: button_settings
+              state: OFF
+      - above: 0.75
+        below: 0.80
+        then:
+          - binary_sensor.template.publish:
+              id: button_up
+              state: OFF
+          - binary_sensor.template.publish:
+              id: button_down
+              state: ON
+          - binary_sensor.template.publish:
+              id: button_power
+              state: OFF
+          - binary_sensor.template.publish:
+              id: button_settings
+              state: OFF
+      - above: 0.41
+        below: 0.44
+        then:
+          - binary_sensor.template.publish:
+              id: button_up
+              state: OFF
+          - binary_sensor.template.publish:
+              id: button_down
+              state: OFF
+          - binary_sensor.template.publish:
+              id: button_power
+              state: OFF
+          - binary_sensor.template.publish:
+              id: button_settings
+              state: ON
+      - above: 0.36
+        below: 0.38
+        then:
+          - binary_sensor.template.publish:
+              id: button_up
+              state: OFF
+          - binary_sensor.template.publish:
+              id: button_down
+              state: ON
+          - binary_sensor.template.publish:
+              id: button_power
+              state: OFF
+          - binary_sensor.template.publish:
+              id: button_settings
+              state: ON
+      - above: 0.29
+        below: 0.30
+        then:
+          - binary_sensor.template.publish:
+              id: button_up
+              state: ON
+          - binary_sensor.template.publish:
+              id: button_down
+              state: OFF
+          - binary_sensor.template.publish:
+              id: button_power
+              state: OFF
+          - binary_sensor.template.publish:
+              id: button_settings
+              state: OFF
+      - above: 0.26
+        below: 0.27
+        then:
+          - binary_sensor.template.publish:
+              id: button_up
+              state: ON
+          - binary_sensor.template.publish:
+              id: button_down
+              state: ON
+          - binary_sensor.template.publish:
+              id: button_power
+              state: OFF
+          - binary_sensor.template.publish:
+              id: button_settings
+              state: OFF
+      - above: 0.20
+        below: 0.22
+        then:
+          - binary_sensor.template.publish:
+              id: button_up
+              state: ON
+          - binary_sensor.template.publish:
+              id: button_down
+              state: OFF
+          - binary_sensor.template.publish:
+              id: button_power
+              state: OFF
+          - binary_sensor.template.publish:
+              id: button_settings
+              state: ON
+      - above: 0.00
+        below: 0.10
+        then:
+          - binary_sensor.template.publish:
+              id: button_up
+              state: OFF
+          - binary_sensor.template.publish:
+              id: button_down
+              state: OFF
+          - binary_sensor.template.publish:
+              id: button_power
+              state: ON
+          - binary_sensor.template.publish:
+              id: button_settings
+              state: OFF
+
+  - platform: htu21d
+    temperature:
+      name: "Temperature"
+    humidity:
+      name: "Humidity"
+    update_interval: 30s
+
+switch:
+  - platform: restart
+    name: ${upper_devicename} Restart
+
+binary_sensor:
+  - platform: gpio
+    pin: 
+      number: GPIO12
+      mode:
+        input: true
+        pullup: true
+    id: pir
+
+  - platform: template
+    id: button_up
+
+  - platform: template
+    id: button_down
+
+  - platform: template
+    id: button_power
+
+  - platform: template
+    id: button_settings
+
+output:
+  - platform: esp8266_pwm
+    pin: GPIO16
+    id: rtttl_out
+
+rtttl:
+  output: rtttl_out
+  on_finished_playback:
+    - logger.log: 'Song ended!'
+

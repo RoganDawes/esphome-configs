@@ -1,0 +1,5 @@
+substitutions:
+  name: garden_floods
+  friendlyname: "Garden Floods"
+
+<<: !include .sonoff_dual_r3.yaml

@@ -1,0 +1,5 @@
+substitutions:
+  devicename: mozzi
+  friendlyname: Mozzi
+
+<<: !include .sonoff_dual_r3.yaml

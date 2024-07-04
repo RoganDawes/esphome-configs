@@ -1,0 +1,78 @@
+substitutions:
+  devicename: courtyard-light
+  upper_devicename: Courtyard Light
+
+esphome:
+  name: ${devicename}
+  on_boot: 
+    priority: 500
+    then:
+      - switch.turn_on: relay
+
+esp8266:
+  board: esp8285
+
+# Enable logging
+logger:
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  domain: .home.dawes.za.net
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "Jt+GD/9A632rbdgRWBRPEPO3CgIIIyAp6/Ful0Xo/Ws="
+
+ota:
+  platform: esphome
+  password: !secret ota_password
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "${upper_devicename} Button"
+    internal: true
+    on_press:
+      - switch.toggle: relay
+
+text_sensor:
+  - platform: version
+    name: ${upper_devicename} ESPHome Version
+  - platform: wifi_info
+    ip_address:
+      name: ${upper_devicename} IP
+    ssid:
+      name: ${upper_devicename} SSID
+    bssid:
+      name: ${upper_devicename} BSSID
+
+sensor:
+  - platform: uptime
+    name: ${upper_devicename} uptime
+
+  - platform: wifi_signal
+    name: ${upper_devicename} WiFi Signal
+    update_interval: 60s
+
+switch:
+  - platform: restart
+    name: ${upper_devicename} Restart
+
+  - platform: gpio
+    name: "${upper_devicename} Relay"
+    pin: GPIO12
+    id: relay
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: yes

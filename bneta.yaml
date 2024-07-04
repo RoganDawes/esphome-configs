@@ -1,0 +1,96 @@
+substitutions:
+  devicename: bneta-plug
+  upper_devicename: Bneta Plug
+
+esphome:
+  name: ${devicename}
+
+esp8266:
+  board: esp8285
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  domain: .home.dawes.za.net
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "/wkBZ9oo7kx+xWGNNincC6k6ipRhF2thZ6HY3WnF1a0="
+
+web_server:
+
+logger:
+  level: DEBUG
+  baud_rate: 0
+
+ota:
+  platform: esphome
+  password: !secret ota_password
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "${upper_devicename} Button"
+    internal: true
+    on_press:
+      - switch.toggle: relay
+
+text_sensor:
+  - platform: version
+    name: ${upper_devicename} ESPHome Version
+  - platform: wifi_info
+    ip_address:
+      name: ${upper_devicename} IP
+    ssid:
+      name: ${upper_devicename} SSID
+    bssid:
+      name: ${upper_devicename} BSSID
+
+sensor:
+  - platform: uptime
+    name: ${upper_devicename} uptime
+
+  - platform: wifi_signal
+    name: ${upper_devicename} WiFi Signal
+    update_interval: 60s
+
+  - platform: hlw8012
+    sel_pin:
+      number: GPIO12
+      inverted: true
+    cf_pin: GPIO4
+    cf1_pin: GPIO5
+    voltage_divider: 2401
+    current:
+      name: "${upper_devicename} Current"
+    voltage:
+      name: "${upper_devicename} Voltage"
+    power:
+      name: "${upper_devicename} Power"
+    energy:
+      name: "${upper_devicename} Energy"
+    change_mode_every: 1 #Skips first reading after each change, so this will double the update interval. Default 8
+    update_interval: 10s #20 second effective update rate for Power, 40 second for Current and Voltage. Default 60s
+
+switch:
+  - platform: restart
+    name: ${upper_devicename} Restart
+
+  - platform: gpio
+    name: "${upper_devicename} Relay"
+    pin: GPIO14
+    id: relay
+    restore_mode: ALWAYS_ON
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: true

@@ -1,0 +1,5 @@
+substitutions:
+  name: courtyard_garden_lights
+  friendlyname: "Courtyard and Garden Lights"
+
+<<: !include .sonoff_dual_r3.yaml
