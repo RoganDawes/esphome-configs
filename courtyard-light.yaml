@@ -1,9 +1,15 @@
 substitutions:
-  devicename: courtyard-light
-  upper_devicename: Courtyard Light
+  name: "courtyard-light"
+  friendly_name: "Courtyard Light"
+  project_name: "courtyard light"
+  project_version: "1.0"
+
+packages:
+  common: !include .common.yaml
 
 esphome:
-  name: ${devicename}
+  name: "${name}"
+  friendly_name: "${friendly_name}"
   on_boot: 
     priority: 500
     then:
@@ -12,26 +18,9 @@ esphome:
 esp8266:
   board: esp8285
 
-# Enable logging
-logger:
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  domain: .home.dawes.za.net
-
-# Enable Home Assistant API
-api:
-  encryption:
-    key: "Jt+GD/9A632rbdgRWBRPEPO3CgIIIyAp6/Ful0Xo/Ws="
-
-ota:
-  platform: esphome
-  password: !secret ota_password
-
-time:
-  - platform: homeassistant
-    id: homeassistant_time
+#api:
+#  encryption:
+#    key: "Jt+GD/9A632rbdgRWBRPEPO3CgIIIyAp6/Ful0Xo/Ws="
 
 binary_sensor:
   - platform: gpio
@@ -39,36 +28,14 @@ binary_sensor:
       number: GPIO0
       mode: INPUT_PULLUP
       inverted: true
-    name: "${upper_devicename} Button"
+    name: "Button"
     internal: true
     on_press:
       - switch.toggle: relay
 
-text_sensor:
-  - platform: version
-    name: ${upper_devicename} ESPHome Version
-  - platform: wifi_info
-    ip_address:
-      name: ${upper_devicename} IP
-    ssid:
-      name: ${upper_devicename} SSID
-    bssid:
-      name: ${upper_devicename} BSSID
-
-sensor:
-  - platform: uptime
-    name: ${upper_devicename} uptime
-
-  - platform: wifi_signal
-    name: ${upper_devicename} WiFi Signal
-    update_interval: 60s
-
 switch:
-  - platform: restart
-    name: ${upper_devicename} Restart
-
   - platform: gpio
-    name: "${upper_devicename} Relay"
+    name: "Relay"
     pin: GPIO12
     id: relay
 

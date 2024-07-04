@@ -1,6 +1,15 @@
-esphome:
+substitutions:
   name: washing-machine
   friendly_name: Washing Machine
+  project_name: "washing machine"
+  project_version: "1.0"
+
+packages:
+  common: !include .common.yaml
+
+esphome:
+  name: "${name}"
+  friendly_name: "${friendly_name}"
 
 bk72xx:
   board: generic-bk7231t-qfn32-tuya
@@ -10,47 +19,7 @@ bk72xx:
 #  framework:
 #    version: dev
 
-logger:
-
-web_server:
-
-captive_portal:
-
-mdns:
-
-api:
-  encryption: 
-    key: !secret api_encryption_key
-
-ota:
-  platform: esphome
-  password: !secret ota_password
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-#  use_address: 192.168.201.146
-  ap:
-
-button:
-- platform: restart
-  name: Restart
-
-debug:
-  update_interval: 30s
-
-text_sensor:
-- platform: debug
-  reset_reason:
-    name: Reset Reason
-- platform: libretiny
-  version:
-    name: LibreTiny Version
-
 sensor:
-- platform: uptime
-  name: Uptime
-
 - platform: hlw8012
   model: BL0937
   cf_pin:
@@ -77,14 +46,14 @@ sensor:
 
 binary_sensor:
 - platform: gpio
-  id: binary_switch_1
+  id: button_
   pin:
     number: P10
     inverted: true
     mode: INPUT_PULLUP
   on_press:
     then:
-    - switch.toggle: switch_1
+    - switch.toggle: _switch
 
 switch:
 - platform: gpio
@@ -93,8 +62,8 @@ switch:
   restore_mode: ALWAYS_ON
 
 - platform: template
-  id: switch_1
-  name: Relay 1
+  id: _switch
+  name: Relay
   lambda: |-
     return id(relay).state;
   turn_on_action:
@@ -105,11 +74,10 @@ switch:
         lambda: 'return id(power).get_state() > 2.8;'
       then:
         - switch.template.publish:
-            id: switch_1
+            id: _switch
             state: ON
       else:
         - switch.turn_off: relay
-
 
 status_led:
   pin: P6
