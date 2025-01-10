@@ -43,6 +43,7 @@ text_sensor:
 sensor:
   - platform: uptime
     name: "Uptime"
+    device_class: duration
 
   - platform: wifi_signal
     name: "WiFi Signal"

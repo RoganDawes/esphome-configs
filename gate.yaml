@@ -7,6 +7,10 @@ substitutions:
 packages:
   common: !include .common.yaml
 
+# Override logging
+# logger:
+#   level: VERBOSE
+
 esphome:
   name: "${name}"
   friendly_name: "${friendly_name}"
@@ -34,134 +38,40 @@ button:
     id: ped
     name: "Pedestrian"
     output: ped_output
-    duration: 1000ms
+    duration: 500ms
   - platform: output
     id: frx
     name: "Free exit"
     internal: true
     output: frx_output
-    duration: 1000ms
+    duration: 500ms
   - platform: output
     id: trg
     name: "Trigger"
     internal: true
     output: trg_output
-    duration: 1000ms
+    duration: 500ms
 
-# maintains an enumeration of possible states of the gate
-# this is the central authority on what is going on
-select:
-  - platform: template
-    id: gate_state_internal
-    internal: true
-    optimistic: true
-    options:
-      - Closed
-      - Opening
-      - Open
-      - Closing
-    set_action:
-      - lambda: |-
-          // Update the text sensor state
-          id(gate_state).publish_state(x);
-
-          // Update the cover state
-          if (x == "Opening") {
-            id(gate_cover).current_operation = COVER_OPERATION_OPENING;
-          } else if (x == "Closing") {
-            id(gate_cover).current_operation = COVER_OPERATION_CLOSING;
-          } else {
-            id(gate_cover).current_operation = COVER_OPERATION_IDLE;
-          }
-          id(gate_cover).publish_state();
-
-# The cover exposed to Home Assistant, representing the gate's motion
 cover:
   - platform: template
-    id: gate_cover
     name: "Gate"
     device_class: gate
+    id: gate
     lambda: |-
-      // Only two valid states for this lambda, CLOSED or OPEN
-      if (id(gate_state_internal).state == "Closed") {
+      if (id(status).state == "Open") {
+        return COVER_OPEN;
+      } else if (id(status).state == "Closed") {
         return COVER_CLOSED;
       } else {
-        return COVER_OPEN;
+        return {};
       }
     open_action:
-      - script.execute: open_gate
-    close_action:
-      - script.execute: close_gate
-    stop_action:
-      - script.execute: stop_gate
-    optimistic: true
-
-sensor:
-# internal sensor used to present the timing of flashes
-# Not exposed to HA, but visible in Debug log events
-# positive numbers are ON, negative numbers are OFF
-  - platform: template
-    id: status_interval
-    internal: true
-    update_interval: never
-    name: "Gate LED Status update interval"
-
-script:
-# Determines the state of the cover when the flashing stops
-# restart and delay essentially makes a timeout
-  - id: update_idle_state
-    mode: restart
-    then:
-      - delay: 2500ms
-      - lambda: !lambda |-
-          auto call = id(gate_state_internal).make_call();
-          if (id(led).state) {
-            call.set_option("Open");
-          } else {
-            call.set_option("Closed");
-          }
-          call.perform();
-
-# The FRX (free exit) signal always opens the gate, no matter what
-  - id: open_gate
-    mode: single
-    then:
       - button.press: frx
-
-# stop the gate if it is moving
-  - id: stop_gate
-    mode: single
-    then:
-      if:
-        condition:
-          lambda: return id(gate_state_internal).state == "Opening" || id(gate_state_internal).state == "Closing";
-        then:
-          - button.press: trg
-          - delay: 1500ms
-
-# Close the gate if it is open or opening
-# NB: this doesn't adress the case where the gate was stopped while closing
-# but not yet fully closed.
-  - id: close_gate
-    mode: single
-    then:
-      - if:
-          condition:
-            lambda: return id(gate_state_internal).state == "Opening";
-          then:
-            - button.press: trg
-            - delay: 2s
-            - button.press: trg
-      - if:
-          condition:
-            lambda: return id(gate_state_internal).state == "Open";
-          then:
-            - button.press: trg
-
-text_sensor:
-  - id: gate_state
-    name: "Gate state"
-    platform: template
+    stop_action:
+      - button.press: trg
+    close_action:
+      - button.press: trg
+    optimistic: false
 
 binary_sensor:
 # attached to the status LED via an opto
@@ -171,37 +81,166 @@ binary_sensor:
       mode: input_pullup
       inverted: true
     id: led
-    on_state:
-      then:
-# Calculate the time since the last state change
-# "Flashes" longer than 3 seconds are considered static state/idle
-        - lambda: |-
-            static int last_toggle = 0;
-            int now = millis();
-            int interval = now - last_toggle;
-            if (now - last_toggle > 3000) {
-              interval = 0;
-            }
-            last_toggle = now;
-            id(status_interval).publish_state(x ? - interval : interval);
+    internal: true
+    entity_category: diagnostic
+    icon: mdi:led-outline
+    disabled_by_default: true
+    publish_initial_state: true
+#    on_state:
+#      - then:
+#        - lambda: |-
+#            static uint32_t last_change = 0;
+#            auto now = millis();
+#            if (last_change > 0) {
+#               ESP_LOGV("main", "LED %s after %dms", x ? "ON" : "OFF", now - last_change);
+#            }
+#            last_change = now;
 
-            // eliminate outliers
-            if (interval < 75 || interval > 500)
-              return;
+  # We use a copy binary_sensor to allow debugging the timing in the primary sensor,
+  # without messing with the filters in this copy sensor
+  - platform: copy
+    source_id: led
+    internal: true
+    id: copy_led
+    entity_category: diagnostic
+    icon: mdi:led-outline
+    disabled_by_default: true
+    filters:
+      - delayed_on_off: 50ms
+    on_multi_click:
+      - timing: # Closed
+          - OFF for at least 2000ms
+        then:
+          - text_sensor.template.publish:
+              id: status
+              state: "Closed"
+          - lambda: |-
+              id(gate).current_operation = CoverOperation::COVER_OPERATION_IDLE;
+              id(gate).publish_state();
+        invalid_cooldown: 50ms
 
-            // determine direction based on flash intervals
-            // Slow opening flashes are approx 350-450ms
-            // Fast closing flashes are approx 100-150ms
-            // However, acceleration/deceleration does stretch out the durations
+      - timing: # Open
+          - ON for at least 2000ms
+        then:
+          - text_sensor.template.publish:
+              id: status
+              state: "Open"
+          - lambda: |-
+              id(gate).current_operation = CoverOperation::COVER_OPERATION_IDLE;
+              id(gate).publish_state();
+        invalid_cooldown: 50ms
 
-            auto call = id(gate_state_internal).make_call();
-            if (interval > 350 && id(gate_state_internal).state == "Closed") {
-              call.set_option("Opening");
-              call.perform();
-            } else if (interval < 150 && id(gate_state_internal).state == "Open") {
-              call.set_option("Closing");
-              call.perform();
-            }
+      - timing: # Closing
+        - ON for 50ms to 250ms
+        - OFF for 50ms to 250ms
+        - ON for 50ms to 250ms
+        - OFF for 50ms to 250ms
+        - ON for 50ms to 250ms
+        - OFF for 50ms to 250ms
+        then:
+          - text_sensor.template.publish:
+              id: status
+              state: "Closing"
+          - lambda: |-
+              id(gate).current_operation = CoverOperation::COVER_OPERATION_CLOSING;
+              id(gate).publish_state();
+        invalid_cooldown: 50ms
 
-        - script.execute: update_idle_state
+      - timing: # Opening - count 6 flashes to be sure this is not an error condition
+          - ON for 250ms to 550ms
+          - OFF for 250ms to 550ms
+          - ON for 250ms to 550ms
+          - OFF for 250ms to 550ms
+          - ON for 250ms to 550ms
+          - OFF for 250ms to 550ms
+          - ON for 250ms to 550ms
+          - OFF for 250ms to 550ms
+          - ON for 250ms to 550ms
+          - OFF for 250ms to 550ms
+          - ON for 250ms to 550ms
+          - OFF for 250ms to 550ms
+        then:
+          - text_sensor.template.publish:
+              id: status
+              state: "Opening"
+          - lambda: |-
+              id(gate).current_operation = CoverOperation::COVER_OPERATION_OPENING;
+              id(gate).publish_state();
+        invalid_cooldown: 50ms
+
+      - timing: # Pillar light override
+          - ON for 200ms to 300ms
+          - OFF for 1700ms to 1800ms
+        then:
+          - logger.log: "Pillar light override"
+          - text_sensor.template.publish:
+              id: status
+              state: "Pillar light override"
+        invalid_cooldown: 100ms
+
+      - timing: # No Mains
+          - ON for 200ms to 300ms
+          - OFF for 200ms to 300ms
+          - ON for 200ms to 300ms
+          - OFF for 1200ms to 1400ms
+        then:
+          - logger.log: "No Mains"
+          - text_sensor.template.publish:
+              id: status
+              state: "No Mains"
+        invalid_cooldown: 100ms
+
+      - timing: # Battery Low
+          - ON for 200ms to 300ms
+          - OFF for 200ms to 300ms
+          - ON for 200ms to 300ms
+          - OFF for 200ms to 300ms
+          - ON for 200ms to 300ms
+          - OFF for 500ms to 1000ms
+        then:
+          - logger.log: "Low Battery"
+          - text_sensor.template.publish:
+              id: status
+              state: "Low Battery"
+        invalid_cooldown: 100ms
+
+      - timing: # Collision detector
+          - ON for 200ms to 300ms
+          - OFF for 200ms to 300ms
+          - ON for 200ms to 300ms
+          - OFF for 200ms to 300ms
+          - ON for 200ms to 300ms
+          - OFF for 200ms to 300ms
+          - ON for 200ms to 300ms
+          - OFF for 500ms to 1000ms
+        then:
+          - logger.log: "Collision Detected"
+          - text_sensor.template.publish:
+              id: status
+              state: "Collision Detected"
+        invalid_cooldown: 100ms
+
+      - timing: # Microprocessor reset
+          - ON for 200ms to 300ms
+          - OFF for 200ms to 300ms
+          - ON for 200ms to 300ms
+          - OFF for 200ms to 300ms
+          - ON for 200ms to 300ms
+          - OFF for 200ms to 300ms
+          - ON for 200ms to 300ms
+          - OFF for 200ms to 300ms
+          - ON for 200ms to 300ms
+          - OFF for 500ms to 1000ms
+        then:
+          - logger.log: "Microprocessor reset"
+          - text_sensor.template.publish:
+              id: status
+              state: "Microprocessor reset"
+        invalid_cooldown: 100ms
+
+text_sensor:
+  - platform: template
+    icon: mdi:information-outline
+    id: status
+    name: "Status"
 
