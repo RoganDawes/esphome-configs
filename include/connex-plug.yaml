@@ -1,0 +1,51 @@
+bk72xx:
+  board: generic-bk7231t-qfn32-tuya
+
+logger:
+  baud_rate: 0
+
+sensor:
+- platform: hlw8012
+  model: BL0937
+  cf_pin:
+    number: P7
+    inverted: true
+  cf1_pin:
+    number: P8
+    inverted: true
+  sel_pin:
+    number: P24
+    inverted: true
+  current:
+    name: Current
+  power:
+    name: Power
+    id: power
+  energy:
+    name: Energy
+  voltage_divider: 800
+  current_resistor: 0.001 ohm
+  initial_mode: CURRENT
+  change_mode_every: 4294967295
+  update_interval: 30s
+
+binary_sensor:
+- platform: gpio
+  id: button_
+  pin:
+    number: P10
+    inverted: true
+    mode: INPUT_PULLUP
+  on_press:
+    then:
+    - switch.toggle: sw1
+
+switch:
+- platform: gpio
+  id: sw1
+  name: Switch
+  pin: P26
+
+status_led:
+  pin: P6
+

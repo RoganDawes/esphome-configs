@@ -1,88 +1,12 @@
-substitutions:
+esphome:
   name: washing-machine
   friendly_name: Washing Machine
-  project_name: "washing machine"
-  project_version: "1.0"
 
 packages:
   common: !include include/common.yaml
-
-esphome:
-  name: "${name}"
-  friendly_name: "${friendly_name}"
-  on_boot:
-    - priority: 90
-      then:
-      - switch.turn_on: _switch
-
-bk72xx:
-  board: generic-bk7231t-qfn32-tuya
-
-#libretiny:
-#  board: generic-bk7231t-qfn32-tuya
-#  framework:
-#    version: dev
-
-sensor:
-- platform: hlw8012
-  model: BL0937
-  cf_pin:
-    number: P7
-    inverted: true
-  cf1_pin:
-    number: P8
-    inverted: true
-  sel_pin:
-    number: P24
-    inverted: true
-  current:
-    name: Current
-  power:
-    name: Power
-    id: power
-  energy:
-    name: Energy
-  voltage_divider: 800
-  current_resistor: 0.001 ohm
-  initial_mode: CURRENT
-  change_mode_every: 4294967295
-  update_interval: 30s
-
-binary_sensor:
-- platform: gpio
-  id: button_
-  pin:
-    number: P10
-    inverted: true
-    mode: INPUT_PULLUP
-  on_press:
-    then:
-    - switch.toggle: _switch
+  connex: !include include/connex-plug.yaml
 
 switch:
-- platform: gpio
-  id: relay
-  pin: P26
-  restore_mode: ALWAYS_ON
-
-- platform: template
-  id: _switch
-  name: Relay
-  lambda: |-
-    return id(relay).state;
-  turn_on_action:
-    - switch.turn_on: relay
-  turn_off_action:
-    if:
-      condition:
-        lambda: 'return id(power).get_state() > 2.8;'
-      then:
-        - switch.template.publish:
-            id: _switch
-            state: ON
-      else:
-        - switch.turn_off: relay
-
-status_led:
-  pin: P6
+  - id: !extend sw1
+    restore_mode: ALWAYS_ON
 
