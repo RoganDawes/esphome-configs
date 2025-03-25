@@ -1,45 +1,15 @@
-substitutions:
+esphome:
   name: "courtyard-light"
   friendly_name: "Courtyard Light"
-  project_name: "courtyard light"
-  project_version: "1.0"
-
-packages:
-  common: !include .common.yaml
-
-esphome:
-  name: "${name}"
-  friendly_name: "${friendly_name}"
   on_boot: 
     priority: 500
     then:
-      - switch.turn_on: relay
+      - light.turn_on: light_1
 
-esp8266:
-  board: esp8285
+packages:
+  common: !include .common.yaml
+  device: !include include/sonoff_basic_light.yaml
 
-#api:
-#  encryption:
-#    key: "Jt+GD/9A632rbdgRWBRPEPO3CgIIIyAp6/Ful0Xo/Ws="
-
-binary_sensor:
-  - platform: gpio
-    pin:
-      number: GPIO0
-      mode: INPUT_PULLUP
-      inverted: true
-    name: "Button"
-    internal: true
-    on_press:
-      - switch.toggle: relay
-
-switch:
-  - platform: gpio
-    name: "Relay"
-    pin: GPIO12
-    id: relay
-
-status_led:
-  pin:
-    number: GPIO13
-    inverted: yes
+light:
+   - id: !extend light_1
+     restore_mode: ALWAYS_ON
