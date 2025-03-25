@@ -1,140 +1,37 @@
-substitutions:
-  devicename: pool
-  upper_devicename: Pool
-
 esphome:
-  name: ${devicename}
-  friendly_name: ${upper_devicename}
+  name: pool
+  friendly_name: Pool
 
-esp8266:
-  board: esp01_1m
-
-# Enable logging
-logger:
-  baud_rate: 0
-
-# Enable Home Assistant API
-api:
-#  encryption:
-#    key: "arj/G8sSu1Zpea+Yga5vNb+l2dJejnbAN8ghULbTkp0="
-
-ota:
-  platform: esphome
-  password: !secret ota_password
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  domain: .home.dawes.za.net
-
-web_server:
-  port: 80
-
-time:
-  - platform: homeassistant
-    id: homeassistant_time
-
-text_sensor:
-  - platform: version
-    name: $upper_devicename ESPHome Version
-  - platform: wifi_info
-    ip_address:
-      name: $upper_devicename IP
-    ssid:
-      name: $upper_devicename SSID
-    bssid:
-      name: $upper_devicename BSSID
+packages:
+  common: !include include/common.yaml
+  sonoff: !include include/sonoff_4ch_pro.yaml
 
 sensor:
-  - platform: uptime
-    name: $upper_devicename uptime
-
-  - platform: wifi_signal
-    name: $upper_devicename WiFi Signal
-    update_interval: 60s
-
   - platform: pulse_counter
     pin: 
       number: GPIO2
       mode: INPUT
     id: flow_rate
-    name: "Pool flow rate"
+    name: "flow rate"
 
 binary_sensor:
-  - platform: status
-    name: $upper_devicename Status
+  - id: !remove button_3
+  - id: !extend button_4
+    on_press:
+      - then:
+          light.toggle: pool_light
 
-  - platform: gpio
-    pin:
-      number: GPIO0
-      mode: INPUT_PULLUP
-      inverted: True
-    id: button_1
-    on_press:
-      then:
-        switch.toggle: pool_pump
-  - platform: gpio
-    pin:
-      number: GPIO9
-      mode: INPUT_PULLUP
-      inverted: True
-    id: button_2
-    on_press:
-      then:
-        switch.toggle: water_feature
-  - platform: gpio
-    pin:
-      number: GPIO10
-      mode: INPUT_PULLUP
-      inverted: True
-    id: button_3
-  - platform: gpio
-    pin:
-      number: GPIO14
-      mode: INPUT_PULLUP
-      inverted: True
-    id: button_4
-    on_press:
-      then:
-        light.toggle: pool_light
-
-  - platform: status
-    name: "Pool 4CH Status"
+switch:
+  - id: !extend relay_1
+    name: "Pump"
+  - id: !extend relay_2
+    name: "Water feature"
+  - id: !remove relay_3
+  - id: !remove relay_4
 
 light:
   - platform: binary
-    name: "Pool Light"
-    output: relay_4
+    name: "Light"
     id: pool_light
+    output: output_4
 
-switch:
-  - platform: restart
-    name: $upper_devicename Restart
-
-  - platform: output
-    name: "Pool pump"
-    id: pool_pump
-    output: relay_1
-  - platform: output
-    name: "Pool water Feature"
-    id: water_feature
-    output: relay_2
-
-output:
-  - platform: gpio
-    id: relay_1
-    pin: GPIO12
-  - platform: gpio
-    id: relay_2
-    pin: GPIO5
-  - platform: gpio
-    id: relay_3
-    pin: GPIO4
-  - platform: gpio
-    id: relay_4
-    pin: GPIO15
-
-status_led:
-  pin:
-    number: GPIO13
-    inverted: True

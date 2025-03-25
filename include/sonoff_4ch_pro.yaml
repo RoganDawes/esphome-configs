@@ -1,0 +1,73 @@
+esp8266:
+  board: esp01_1m
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    id: button_1
+    on_press:
+      then:
+        switch.toggle: relay_1
+  - platform: gpio
+    pin:
+      number: GPIO9
+      mode: INPUT_PULLUP
+      inverted: True
+    id: button_2
+    on_press:
+      then:
+        switch.toggle: relay_2
+  - platform: gpio
+    pin:
+      number: GPIO10
+      mode: INPUT_PULLUP
+      inverted: True
+    id: button_3
+    on_press:
+      then:
+        switch.toggle: relay_3
+  - platform: gpio
+    pin:
+      number: GPIO14
+      mode: INPUT_PULLUP
+      inverted: True
+    id: button_4
+    on_press:
+      then:
+        switch.toggle: relay4
+
+switch:
+  - platform: output
+    id: relay_1
+    output: output_1
+  - platform: output
+    id: relay_2
+    output: output_2
+  - platform: output
+    id: relay_3
+    output: output_3
+  - platform: output
+    id: relay_4
+    output: output_4
+
+output:
+  - platform: gpio
+    id: output_1
+    pin: GPIO12
+  - platform: gpio
+    id: output_2
+    pin: GPIO5
+  - platform: gpio
+    id: output_3
+    pin: GPIO4
+  - platform: gpio
+    id: output_4
+    pin: GPIO15
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: True
