@@ -26,6 +26,8 @@ logger:
   baud_rate: 0
   level: DEBUG
 
+bluetooth_proxy:
+
 binary_sensor:
   # single main button that also puts device into flash mode when held on boot
   # For someone in the ceiling, this can be used to turn the climate control
