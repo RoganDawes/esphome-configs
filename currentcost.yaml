@@ -1,11 +1,6 @@
-substitutions:
-  devicename: currentcost
-  upper_devicename: CurrentCost
-
 esphome:
-  name: ${devicename}
-  platform: esp32
-  board: esp32dev
+  name: currentcost
+  friendly_name: CurrentCost
   platformio_options:
     upload_speed: 460800
     build_flags: -DRAPIDXML_STATIC_POOL_SIZE=1024 -DRAPIDXML_DYNAMIC_POOL_SIZE=1024
@@ -14,60 +9,22 @@ esphome:
      - rapidxml
      - currentcost.h
 
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  domain: !secret wifi_domain
+packages:
+  common: !include include/common.yaml
+
+esp32:
+  board: esp32dev
 
 # Enable logging
 logger:
   baud_rate: 0
-  level: VERBOSE
+#  level: VERBOSE
 
-web_server:
-
-# Enable Home Assistant API
-api:
-
-ota:
-  platform: esphome
-  password: !secret ota_password
-
-time:
-  - platform: homeassistant
-    id: homeassistant_time
-
-#bluetooth_proxy:
+bluetooth_proxy:
 
 #esp32_ble_tracker:
 
-text_sensor:
-  - platform: version
-    name: ${upper_devicename} ESPHome Version
-  - platform: wifi_info
-    ip_address:
-      name: ${upper_devicename} IP
-    ssid:
-      name: ${upper_devicename} SSID
-    bssid:
-      name: ${upper_devicename} BSSID
-
-switch:
-  - platform: restart
-    name: ${upper_devicename} Restart
-
-binary_sensor:
-  - platform: status
-    name: ${upper_devicename} Status
-
 sensor:
-  - platform: uptime
-    name: ${upper_devicename} uptime
-
-  - platform: wifi_signal
-    name: ${upper_devicename} WiFi Signal
-    update_interval: 60s
-
   - platform: custom
     lambda: |-
       auto currentcost = new CurrentCostSensor(id(uart_bus));
