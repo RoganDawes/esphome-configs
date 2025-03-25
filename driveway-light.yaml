@@ -7,7 +7,7 @@ esphome:
       - light.turn_on: light_1
 
 packages:
-  common: !include .common.yaml
+  common: !include include/common.yaml
   device: !include include/sonoff_basic_light.yaml
 
 light:

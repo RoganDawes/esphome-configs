@@ -3,7 +3,7 @@ esphome:
   friendly_name: "Garden Floods"
 
 packages:
-  common: !include .common.yaml
+  common: !include include/common.yaml
   device: !include include/sonoff_dual_r3.yaml
 
 light:

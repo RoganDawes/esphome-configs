@@ -5,7 +5,7 @@ substitutions:
   project_version: "1.0"
 
 packages:
-  common: !include .common.yaml
+  common: !include include/common.yaml
 
 esphome:
   name: "${name}"
