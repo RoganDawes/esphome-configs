@@ -1,0 +1,37 @@
+bk72xx:
+  board: wb2s
+
+uart:
+  - id: uart_tuya
+    rx_pin: RX1
+    tx_pin: TX1
+
+    baud_rate: 115200
+
+# The dimmer tries to turn off the light after a few seconds
+tuya:
+  on_datapoint_update:
+    - sensor_datapoint: 20
+      datapoint_type: bool
+      then:
+        - if:
+            condition:
+              and:
+                - light.is_on: dimmer
+                - lambda: 'return !x;'
+#                lambda: 'return esphome::millis() < 60000 && !x;'
+            then:
+              - logger.log: "Turning the light back on"
+              - delay: 10ms
+              - light.turn_on: 
+                  id: dimmer
+
+light:
+  - platform: "tuya"
+    id: dimmer
+    name: "dimmer"
+    dimmer_datapoint: 22
+    min_value_datapoint: 26
+    switch_datapoint: 20
+    min_value: 50
+    max_value: 1000
