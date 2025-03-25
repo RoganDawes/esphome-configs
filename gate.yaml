@@ -86,15 +86,24 @@ binary_sensor:
     icon: mdi:led-outline
     disabled_by_default: true
     publish_initial_state: true
-#    on_state:
-#      - then:
-#        - lambda: |-
-#            static uint32_t last_change = 0;
-#            auto now = millis();
-#            if (last_change > 0) {
-#               ESP_LOGV("main", "LED %s after %dms", x ? "ON" : "OFF", now - last_change);
-#            }
-#            last_change = now;
+    on_state:
+      - then:
+        - lambda: |-
+            static uint32_t last_change = 0;
+            static uint32_t opening = 0;
+            auto now = millis();
+            if (last_change > 0) {
+               uint32_t elapsed = now - last_change;
+               ESP_LOGI("main", "LED %s for %dms", x ? "OFF" : "ON", now - last_change);
+               if (elapsed > 2000 && x) {
+                 opening = now;
+               }
+               if (opening > 0 && id(gate).current_operation == CoverOperation::COVER_OPERATION_OPENING) {
+                 ESP_LOGI("main", "Detected gate opening after %dms", now - opening);
+                 opening = 0;
+               }
+            }
+            last_change = now;
 
   # We use a copy binary_sensor to allow debugging the timing in the primary sensor,
   # without messing with the filters in this copy sensor
@@ -131,12 +140,10 @@ binary_sensor:
         invalid_cooldown: 50ms
 
       - timing: # Closing
-        - ON for 50ms to 250ms
-        - OFF for 50ms to 250ms
-        - ON for 50ms to 250ms
-        - OFF for 50ms to 250ms
-        - ON for 50ms to 250ms
-        - OFF for 50ms to 250ms
+        - ON for 50ms to 200ms
+        - OFF for 50ms to 200ms
+        - ON for 50ms to 200ms
+        - OFF for 50ms to 200ms
         then:
           - text_sensor.template.publish:
               id: status
@@ -146,18 +153,9 @@ binary_sensor:
               id(gate).publish_state();
         invalid_cooldown: 50ms
 
-      - timing: # Opening - count 6 flashes to be sure this is not an error condition
-          - ON for 250ms to 550ms
-          - OFF for 250ms to 550ms
-          - ON for 250ms to 550ms
-          - OFF for 250ms to 550ms
-          - ON for 250ms to 550ms
-          - OFF for 250ms to 550ms
-          - ON for 250ms to 550ms
-          - OFF for 250ms to 550ms
-          - ON for 250ms to 550ms
-          - OFF for 250ms to 550ms
-          - ON for 250ms to 550ms
+      - timing: # Opening - initial long flash after long OFF is during initial acceleration
+          - OFF for at least 500ms
+          - ON for 1500ms to 2200ms
           - OFF for 250ms to 550ms
         then:
           - text_sensor.template.publish:
