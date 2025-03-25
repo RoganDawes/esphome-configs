@@ -1,5 +1,13 @@
-substitutions:
-  name: courtyard_garden_lights
-  friendlyname: "Courtyard and Garden Lights"
+esphome:
+  name: "courtyard-garden-lights"
+  friendly_name: "Courtyard and Garden Lights"
 
-<<: !include .sonoff_dual_r3.yaml
+packages:
+  common: !include .common.yaml
+  device: !include include/sonoff_dual_r3.yaml
+
+light:
+   - id: !extend sw1
+     restore_mode: ALWAYS_ON
+   - id: !extend sw2
+     restore_mode: ALWAYS_ON
