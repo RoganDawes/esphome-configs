@@ -1,32 +1,20 @@
-esp8266:
-  board: esp01_1m
+packages:
+  basic: !include sonoff_basic.yaml
+
+switch:
+  - id: !remove relay_1
 
 binary_sensor:
-  - platform: gpio
-    pin:
-      number: GPIO0
-      mode:
-        input: true
-        pullup: true
-      inverted: true
-    id: button_1
+  - id: !remove button_1
+    on_press:
+  - id: !extend button_1
     on_press:
       then:
         - light.toggle: light_1
-
-output:
-  - platform: gpio
-    pin: GPIO12
-    id: relay_1
 
 light:
   - platform: binary
     name: "switch"
     id: light_1
-    output: relay_1
-
-status_led:
-  pin:
-    number: GPIO13
-    inverted: yes
+    output: output_1
 
