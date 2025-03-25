@@ -21,7 +21,6 @@ wifi:
   domain: !secret wifi_domain
   fast_connect: true
   ap:
-    ssid: "${name} Fallback AP"
     password: !secret wifi_ap_password
 
 web_server:
