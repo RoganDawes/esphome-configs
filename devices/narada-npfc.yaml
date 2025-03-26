@@ -1,0 +1,466 @@
+# Source document can be found here:
+#   https://pdfcoffee.com/qdownload/narada-bms-modbus-v16-2-pdf-free.html
+#   
+#text_sensor:
+#  - platform: modbus_controller
+#    modbus_controller_id: ${modbus_controller_id}
+#    name: "${battery} Product style"
+#    id: ${modbus_controller_id}_product_style
+#    # ${modbus_controller_id} : modbus device address
+#    # 0x11: modbus function code
+#    # 0x00: high byte of modbus register address
+#    # 0x00: low byte of modbus register address
+#    # 0x00: high byte of total number of registers requested
+#    # 0x00: low byte of total number of registers requested
+#    custom_command: 
+#      - ${modbus_device}
+#      - 0x11
+#      - 0x00
+#      - 0x00
+#      - 0x00
+#      - 0x00
+#    raw_encode: COMMA
+#
+#  - platform: template
+#    name: "${battery} Software Version"
+#    id: ${modbus_controller_id}_software_version
+#
+#  - platform: template
+#    name: "${battery} Hardware Version"
+#    id: ${modbus_controller_id}_hardware_version
+#
+#  - platform: template
+#    name: "${battery} Serial Number"
+#    id: ${modbus_controller_id}_serial_number
+#
+#  - platform: template
+#    name: "${battery} Date of Manufacture"
+#    id: ${modbus_controller_id}_date_of_manufacture
+
+binary_sensor:
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x1006
+    register_type: read
+    bitmask: 0x0100
+    name: "${battery} Pack Charging"
+    id: ${modbus_controller_id}_pack_charging
+    entity_category: diagnostic
+    device_class: battery_charging
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x1006
+    register_type: read
+    bitmask: 0x0200
+    name: "${battery} Pack Discharging"
+    id: ${modbus_controller_id}_pack_discharging
+    entity_category: diagnostic
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x1006
+    register_type: read
+    bitmask: 0x0400
+    name: "${battery} Pack Chg MOS Connect"
+    id: ${modbus_controller_id}_pack_chg_mos_connect
+    entity_category: diagnostic
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x1006
+    register_type: read
+    bitmask: 0x0800
+    name: "${battery} Pack Dischg MOS Connect"
+    id: ${modbus_controller_id}_pack_dischg_mos_connect
+    entity_category: diagnostic
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x1006
+    register_type: read
+    bitmask: 0x1000
+    name: "${battery} Pack Limit Current Enable"
+    id: ${modbus_controller_id}_pack_limit_current_enable
+    entity_category: diagnostic
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x1006
+    register_type: read
+    bitmask: 0x2000
+    name: "${battery} Pack Fully Charged"
+    id: ${modbus_controller_id}_pack_fully_charged
+    entity_category: diagnostic
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x1006
+    register_type: read
+    bitmask: 0x4000
+    name: "${battery} Pack Module Failure but In Operation"
+    id: ${modbus_controller_id}_pack_module_failure_in_operation
+    entity_category: diagnostic
+    device_class: problem
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x1006
+    register_type: read
+    bitmask: 0x8000
+    name: "${battery} Pack Module Failure Out of Operation"
+    id: ${modbus_controller_id}_pack_module_failure_out_of_operation
+    entity_category: diagnostic
+    device_class: problem
+
+sensor:
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x0FFF
+    register_type: read
+    name: "${battery} Pack Volt"
+    id: ${modbus_controller_id}_pack_volt
+    unit_of_measurement: V
+    device_class: voltage
+    state_class: measurement
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 2
+    filters:
+    - multiply: 0.01
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x1000
+    register_type: read
+    name: "${battery} Current"
+    id: ${modbus_controller_id}_pack_current
+    unit_of_measurement: A
+    device_class: current
+    state_class: measurement
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - offset: -10000
+    - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${battery} Power"
+    address: 0x0FFF
+    register_type: read
+    value_type: U_WORD
+    register_count: 2
+    response_size: 4
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+    accuracy_decimals: 2
+    lambda: |-
+      if (data.size() < 4) {
+        return NAN;
+      }
+      float voltage = (int16_t)(data[0] << 8 | data[1] << 0) * 0.01;
+      float current = ((int16_t)(data[2] << 8 | data[3] << 0) - 10000) * 0.1;
+      return voltage * current;
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x1001
+    register_type: read
+    name: "${battery} Remain Capacity"
+    id: ${modbus_controller_id}_remain_capacity
+    unit_of_measurement: Ah
+    device_class: energy_storage
+    state_class: measurement
+    entity_category: diagnostic
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x1002
+    register_type: read
+    name: "${battery} Average Cell T"
+    id: ${modbus_controller_id}_average_cell_t
+    unit_of_measurement: C
+    device_class: temperature
+    state_class: measurement
+    entity_category: diagnostic
+    skip_updates: 5
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 2
+    filters:
+    - offset: -400
+    - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x1003
+    register_type: read
+    name: "${battery} Env T"
+    id: ${modbus_controller_id}_env_t
+    unit_of_measurement: C
+    device_class: temperature
+    state_class: measurement
+    entity_category: diagnostic
+    skip_updates: 5
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - offset: -400
+    - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x1007
+    register_type: read
+    name: "${battery} SoC"
+    id: ${modbus_controller_id}_soc
+    device_class: battery
+    unit_of_measurement: percent
+    state_class: measurement
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 2
+    filters:
+    - multiply: 0.01
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x1009
+    register_type: read
+    name: "${battery} SoH"
+    id: ${modbus_controller_id}_soh
+    unit_of_measurement: percent
+    state_class: measurement
+    entity_category: diagnostic
+    skip_updates: 5
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 2
+    filters:
+    - multiply: 0.01
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x100A
+    register_type: read
+    name: "${battery} PCB T"
+    id: ${modbus_controller_id}_pcb_t
+    unit_of_measurement: C
+    device_class: temperature
+    state_class: measurement
+    entity_category: diagnostic
+    skip_updates: 5
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - offset: -400
+    - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x100C
+    register_type: read
+    name: "${battery} Cell Num"
+    id: ${modbus_controller_id}_cell_num
+    state_class: measurement
+    unit_of_measurement: ""
+    entity_category: diagnostic
+    skip_updates: 100
+    icon: mdi:flash
+    value_type: U_WORD
+    register_count: 17
+    response_size: 34
+    accuracy_decimals: 0
+    lambda: |-
+      uint8_t cells = data[item->offset+1];
+      if (data.size() < 2 + cells * 2) {
+        return cells;
+      }
+
+      float min_cell_voltage = 100.0f;
+      float max_cell_voltage = -100.0f;
+      float average_cell_voltage = 0.0f;
+      uint8_t min_voltage_cell = 0;
+      uint8_t max_voltage_cell = 0;
+      for (uint8_t i = 0; i < cells; i++) {
+        float cell_voltage = (uint16_t)(data[item->offset + 2 + (i * 2)] << 8 | data[item->offset + 2 + (i * 2) + 1] << 0) * 0.001f;
+        average_cell_voltage = average_cell_voltage + cell_voltage;
+        if (cell_voltage < min_cell_voltage) {
+            min_cell_voltage = cell_voltage;
+            min_voltage_cell = i + 1;
+        }
+        if (cell_voltage > max_cell_voltage) {
+          max_cell_voltage = cell_voltage;
+          max_voltage_cell = i + 1;
+        }
+      }
+      average_cell_voltage = average_cell_voltage / cells;
+
+      id(${modbus_controller_id}_delta_cell_voltage).publish_state(max_cell_voltage - min_cell_voltage);
+      id(${modbus_controller_id}_average_cell_voltage).publish_state(average_cell_voltage);
+      id(${modbus_controller_id}_min_cell_voltage).publish_state(min_cell_voltage);
+      id(${modbus_controller_id}_max_cell_voltage).publish_state(max_cell_voltage);
+      id(${modbus_controller_id}_min_voltage_cell).publish_state(min_voltage_cell);
+      id(${modbus_controller_id}_max_voltage_cell).publish_state(max_voltage_cell);
+
+      return cells;
+
+  - platform: template
+    id: ${modbus_controller_id}_delta_cell_voltage
+    name: "${battery} Delta Cell Voltage"
+    update_interval: never
+    unit_of_measurement: V
+    device_class: voltage
+    state_class: measurement
+    entity_category: diagnostic
+    accuracy_decimals: 3
+
+  - platform: template
+    id: ${modbus_controller_id}_average_cell_voltage
+    name: "${battery} Average Cell Voltage"
+    update_interval: never
+    unit_of_measurement: V
+    device_class: voltage
+    state_class: measurement
+    entity_category: diagnostic
+    accuracy_decimals: 3
+
+  - platform: template
+    id: ${modbus_controller_id}_min_cell_voltage
+    name: "${battery} Min Cell Voltage"
+    update_interval: never
+    unit_of_measurement: V
+    device_class: voltage
+    state_class: measurement
+    entity_category: diagnostic
+    accuracy_decimals: 3
+
+  - platform: template
+    id: ${modbus_controller_id}_max_cell_voltage
+    name: "${battery} Max Cell Voltage"
+    update_interval: never
+    unit_of_measurement: V
+    device_class: voltage
+    state_class: measurement
+    entity_category: diagnostic
+    accuracy_decimals: 3
+
+  - platform: template
+    id: ${modbus_controller_id}_min_voltage_cell
+    name: "${battery} Min Voltage Cell"
+    update_interval: never
+    unit_of_measurement: ""
+    state_class: measurement
+    entity_category: diagnostic
+    accuracy_decimals: 0
+
+  - platform: template
+    id: ${modbus_controller_id}_max_voltage_cell
+    name: "${battery} Max Voltage Cell"
+    update_interval: never
+    unit_of_measurement: ""
+    state_class: measurement
+    entity_category: diagnostic
+    accuracy_decimals: 0
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x101D
+    register_type: read
+    name: "${battery} Temp Num"
+    id: ${modbus_controller_id}_temp_num
+    state_class: measurement
+    unit_of_measurement: ""
+    entity_category: diagnostic
+    skip_updates: 100
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 0
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x102E
+    register_type: read
+    name: "${battery} Full Capacity"
+    id: ${modbus_controller_id}_full_capacity
+    unit_of_measurement: 'Ah'
+    device_class: energy_storage
+    state_class: measurement
+    entity_category: diagnostic
+    skip_updates: 5
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 1
+    filters:
+    - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x102F
+    register_type: read
+    name: "${battery} Remain Charge Time"
+    id: ${modbus_controller_id}_remain_charge_time
+    unit_of_measurement: 'min'
+    state_class: measurement
+    entity_category: diagnostic
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 0
+
+  - platform: modbus_controller
+    modbus_controller_id: ${modbus_controller_id}
+    address: 0x1030
+    register_type: read
+    name: "${battery} Remain Discharge Time"
+    id: ${modbus_controller_id}_remain_discharge_time
+    unit_of_measurement: 'min'
+    state_class: measurement
+    entity_category: diagnostic
+    icon: mdi:flash
+    value_type: U_WORD
+    accuracy_decimals: 0
+
+packages:
+  ${modbus_controller_id}_cell_0_v:  !include { file: narada-npfc-cell-volt.yaml, vars: { volt_address: 0x100D, cell: 0 }}
+  ${modbus_controller_id}_cell_1_v:  !include { file: narada-npfc-cell-volt.yaml, vars: { volt_address: 0x100E, cell: 1 }}
+  ${modbus_controller_id}_cell_2_v:  !include { file: narada-npfc-cell-volt.yaml, vars: { volt_address: 0x100F, cell: 2 }}
+  ${modbus_controller_id}_cell_3_v:  !include { file: narada-npfc-cell-volt.yaml, vars: { volt_address: 0x1010, cell: 3 }}
+  ${modbus_controller_id}_cell_4_v:  !include { file: narada-npfc-cell-volt.yaml, vars: { volt_address: 0x1011, cell: 4 }}
+  ${modbus_controller_id}_cell_5_v:  !include { file: narada-npfc-cell-volt.yaml, vars: { volt_address: 0x1012, cell: 5 }}
+  ${modbus_controller_id}_cell_6_v:  !include { file: narada-npfc-cell-volt.yaml, vars: { volt_address: 0x1013, cell: 6 }}
+  ${modbus_controller_id}_cell_7_v:  !include { file: narada-npfc-cell-volt.yaml, vars: { volt_address: 0x1014, cell: 7 }}
+  ${modbus_controller_id}_cell_8_v:  !include { file: narada-npfc-cell-volt.yaml, vars: { volt_address: 0x1015, cell: 8 }}
+  ${modbus_controller_id}_cell_9_v:  !include { file: narada-npfc-cell-volt.yaml, vars: { volt_address: 0x1016, cell: 9 }}
+  ${modbus_controller_id}_cell_10_v: !include { file: narada-npfc-cell-volt.yaml, vars: { volt_address: 0x1017, cell: 10}}
+  ${modbus_controller_id}_cell_11_v: !include { file: narada-npfc-cell-volt.yaml, vars: { volt_address: 0x1018, cell: 11}}
+  ${modbus_controller_id}_cell_12_v: !include { file: narada-npfc-cell-volt.yaml, vars: { volt_address: 0x1019, cell: 12}}
+  ${modbus_controller_id}_cell_13_v: !include { file: narada-npfc-cell-volt.yaml, vars: { volt_address: 0x101A, cell: 13}}
+  ${modbus_controller_id}_cell_14_v: !include { file: narada-npfc-cell-volt.yaml, vars: { volt_address: 0x101B, cell: 14}}
+  ${modbus_controller_id}_cell_15_v: !include { file: narada-npfc-cell-volt.yaml, vars: { volt_address: 0x101C, cell: 15}}
+
+  ${modbus_controller_id}_cell_0_t:  !include { file: narada-npfc-cell-temp.yaml, vars: { temp_address: 0x101E, cell: 0 }}
+  ${modbus_controller_id}_cell_1_t:  !include { file: narada-npfc-cell-temp.yaml, vars: { temp_address: 0x101F, cell: 1 }}
+  ${modbus_controller_id}_cell_2_t:  !include { file: narada-npfc-cell-temp.yaml, vars: { temp_address: 0x1020, cell: 2 }}
+  ${modbus_controller_id}_cell_3_t:  !include { file: narada-npfc-cell-temp.yaml, vars: { temp_address: 0x1021, cell: 3 }}
+  ${modbus_controller_id}_cell_4_t:  !include { file: narada-npfc-cell-temp.yaml, vars: { temp_address: 0x1021, cell: 4 }}
+  ${modbus_controller_id}_cell_5_t:  !include { file: narada-npfc-cell-temp.yaml, vars: { temp_address: 0x1021, cell: 5 }}
+  ${modbus_controller_id}_cell_6_t:  !include { file: narada-npfc-cell-temp.yaml, vars: { temp_address: 0x1021, cell: 6 }}
+  ${modbus_controller_id}_cell_7_t:  !include { file: narada-npfc-cell-temp.yaml, vars: { temp_address: 0x1021, cell: 7 }}
+  ${modbus_controller_id}_cell_8_t:  !include { file: narada-npfc-cell-temp.yaml, vars: { temp_address: 0x1021, cell: 8 }}
+  ${modbus_controller_id}_cell_9_t:  !include { file: narada-npfc-cell-temp.yaml, vars: { temp_address: 0x1021, cell: 9 }}
+  ${modbus_controller_id}_cell_10_t: !include { file: narada-npfc-cell-temp.yaml, vars: { temp_address: 0x1021, cell: 10}}
+  ${modbus_controller_id}_cell_11_t: !include { file: narada-npfc-cell-temp.yaml, vars: { temp_address: 0x1021, cell: 11}}
+  ${modbus_controller_id}_cell_12_t: !include { file: narada-npfc-cell-temp.yaml, vars: { temp_address: 0x1021, cell: 12}}
+  ${modbus_controller_id}_cell_13_t: !include { file: narada-npfc-cell-temp.yaml, vars: { temp_address: 0x1021, cell: 13}}
+  ${modbus_controller_id}_cell_14_t: !include { file: narada-npfc-cell-temp.yaml, vars: { temp_address: 0x1021, cell: 14}}
+  ${modbus_controller_id}_cell_15_t: !include { file: narada-npfc-cell-temp.yaml, vars: { temp_address: 0x1021, cell: 15}}

@@ -1,0 +1,37 @@
+# this is a snippet showing how to access the Narada NPFC batteries
+# in ESPHome, using a RS485 interface
+
+uart:
+  - id: modbus_uart
+    baud_rate: 9600
+    tx_pin: GPIO17
+    rx_pin: GPIO16
+
+modbus:
+  id: modbus1
+  uart_id: modbus_uart
+  flow_control_pin: GPIO4
+
+modbus_controller:
+  - id: narada_39
+    address: 39
+    modbus_id: modbus1
+    setup_priority: -10
+
+  - id: narada_40
+    address: 40
+    modbus_id: modbus1
+    setup_priority: -10
+
+packages:
+  battery_1: !include
+    file: devices/narada-npfc.yaml
+    vars:
+      modbus_controller_id: narada_39
+      battery: Battery 1
+  battery_2: !include
+    file: devices/narada-npfc.yaml
+    vars:
+      modbus_controller_id: narada_40
+      battery: Battery 2
+
