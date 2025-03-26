@@ -1,38 +1,5 @@
-substitutions:
-  devicename: thermostat1
-  upper_devicename: Thermostat 1
-
-esphome:
-  name: ${devicename}
-#  on_boot:
-#    then:
-#      - rtttl.play: 'MissionImp:d=16,o=6,b=95:32d,32d#,32d,32d#,32d,32d#,32d,32d#,32d,32d,32d#,32e,32f,32f#,32g,g,8p,g,8p,a#,p,c7,p,g,8p,g,8p,f,p,f#,p,g,8p,g,8p,a#,p,c7,p,g,8p,g,8p,f,p,f#,p,a#,g,2d,32p,a#,g,2c#,32p,a#,g,2c,a#5,8c,2p,32p,a#5,g5,2f#,32p,a#5,g5,2f,32p,a#5,g5,2e,d#,8d'
-
 esp8266:
   board: esp8285
-
-# Enable logging
-logger:
-
-# Enable Home Assistant API
-api:
-  encryption:
-    key: "rqJ1sZ0vGkxA4bV5Bjbj44bYFV4njNHejMsBBZlvC0o="
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  domain: .home.dawes.za.net
-
-ota:
-  platform: esphome
-  password: !secret ota_password
-
-web_server:
-
-time:
-  - platform: homeassistant
-    id: homeassistant_time
 
 i2c:
   scan: true
@@ -62,44 +29,12 @@ display:
     eight_bit_color: true
     update_interval: 1s
     id: my_display
-    pages:
-      - id: page1
-        lambda: |-
-          it.print(0, 10, id(my_font), "This is page 1!");
-      - id: page2
-        lambda: |-
-          it.print(0, 10, id(my_font), "This is page 2!");
-
-interval:
-  - interval: 5s
-    then:
-      - display.page.show_next: my_display
-      - component.update: my_display
-
-text_sensor:
-  - platform: version
-    name: ${upper_devicename} ESPHome Version
-  - platform: wifi_info
-    ip_address:
-      name: ${upper_devicename} IP
-    ssid:
-      name: ${upper_devicename} SSID
-    bssid:
-      name: ${upper_devicename} BSSID
 
 sensor:
-  - platform: uptime
-    name: ${upper_devicename} uptime
-
-  - platform: wifi_signal
-    name: ${upper_devicename} WiFi Signal
-    update_interval: 60s
-
   - platform: adc
     pin: A0
     name: "Buttons"
-#    update_interval: 50ms
-    update_interval: 1s
+    update_interval: 100ms
     internal: true
     on_value_range:
       - above: 0.99
@@ -229,10 +164,6 @@ sensor:
       name: "Humidity"
     update_interval: 30s
 
-switch:
-  - platform: restart
-    name: ${upper_devicename} Restart
-
 binary_sensor:
   - platform: gpio
     pin: 
@@ -261,6 +192,4 @@ output:
 
 rtttl:
   output: rtttl_out
-  on_finished_playback:
-    - logger.log: 'Song ended!'
 
