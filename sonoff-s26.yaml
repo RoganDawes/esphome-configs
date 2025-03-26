@@ -8,7 +8,7 @@ esphome:
 
 packages:
   common: !include include/common.yaml
-  sonoff: !include include/sonoff_basic.yaml
+  sonoff: !include devices/sonoff_basic.yaml
 
 switch:
   - id: !extend relay_1

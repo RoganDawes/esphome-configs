@@ -4,7 +4,7 @@ esphome:
 
 packages:
   common: !include include/common.yaml
-  device: !include include/sonoff_dual_r3.yaml
+  device: !include devices/sonoff_dual_r3.yaml
 
 light:
    - id: !extend sw1

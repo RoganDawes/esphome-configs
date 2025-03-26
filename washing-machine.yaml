@@ -4,7 +4,7 @@ esphome:
 
 packages:
   common: !include include/common.yaml
-  connex: !include include/connex-plug.yaml
+  connex: !include devices/connex-plug.yaml
 
 switch:
   - id: !extend sw1

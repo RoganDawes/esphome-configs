@@ -7,4 +7,4 @@ esphome:
 
 packages:
   common: !include include/common.yaml
-  dimmer: !include include/tuya_dimmer.yaml
+  dimmer: !include devices/tuya_dimmer.yaml

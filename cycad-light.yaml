@@ -8,7 +8,7 @@ esphome:
 
 packages:
   common: !include include/common.yaml
-  device: !include include/sonoff_basic_light.yaml
+  device: !include devices/sonoff_basic_light.yaml
 
 light:
    - id: !extend light_1

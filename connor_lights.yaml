@@ -2,12 +2,13 @@ esphome:
   name: connor-lights
   friendly_name: Connor Lights
 
-esp8266:
-  board: esp01
-
 packages:
   common: !include include/common.yaml
-  h801: !include include/h801.yaml
+  h801: !include devices/h801.yaml
+
+# This happens to be a low-flash variant, only 512kB
+esp8266:
+  board: esp01
 
 # remove components to fit into flash
 ota: !remove

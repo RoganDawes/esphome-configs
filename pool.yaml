@@ -4,7 +4,7 @@ esphome:
 
 packages:
   common: !include include/common.yaml
-  sonoff: !include include/sonoff_4ch_pro.yaml
+  sonoff: !include devices/sonoff_4ch_pro.yaml
 
 sensor:
   - platform: pulse_counter

@@ -5,8 +5,8 @@ switch:
   - id: !remove relay_1
 
 binary_sensor:
-  - id: !remove button_1
-    on_press:
+  - id: !extend button_1
+    on_press: !remove
   - id: !extend button_1
     on_press:
       then:

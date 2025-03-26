@@ -15,7 +15,7 @@ esphome:
 
 packages:
   common: !include include/common.yaml
-  sonoff: !include include/sonoff_thr320.yaml
+  sonoff: !include devices/sonoff_thr320.yaml
 
 bluetooth_proxy:
 

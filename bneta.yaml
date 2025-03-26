@@ -4,5 +4,5 @@ esphome:
 
 packages:
   common: !include include/common.yaml
-  bneta: !include include/bneta_plug.yaml
+  bneta: !include devices/bneta_plug.yaml
 

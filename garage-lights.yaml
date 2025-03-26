@@ -7,7 +7,7 @@ esp8266:
 
 packages:
   common: !include include/common.yaml
-  h801: !include include/h801.yaml
+  h801: !include devices/h801.yaml
 
 light:
   - id: !extend rgbw_
