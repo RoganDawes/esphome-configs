@@ -1,7 +1,3 @@
-substitutions:
-  devicename: sonoff-s26
-  upper_devicename: Sonoff S26
-
 esphome:
   name: sonoff-s26
   friendly_name: Sonoff S26

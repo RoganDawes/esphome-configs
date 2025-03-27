@@ -1,22 +1,16 @@
-substitutions:
+esphome:
   name: "gate"
   friendly_name: "Gate"
-  project_name: "gate controller"
-  project_version: "1.0"
 
 packages:
   common: !include include/common.yaml
 
+esp32:
+  board: esp32dev
+
 # Override logging
 # logger:
 #   level: VERBOSE
-
-esphome:
-  name: "${name}"
-  friendly_name: "${friendly_name}"
-
-esp32:
-  board: esp32dev
 
 bluetooth_proxy:
 
