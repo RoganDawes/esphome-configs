@@ -48,7 +48,7 @@ button:
 
 cover:
   - platform: template
-    name: "Gate"
+    name: None
     device_class: gate
     id: gate
     lambda: |-
