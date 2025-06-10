@@ -1,0 +1,80 @@
+esphome:
+  name: rx400
+  friendly_name: RX400
+
+external_components:
+  - source: github://RoganDawes/esphome@keeloq_2025
+    components: [ keeloq_normal_crypter, hcs301 ]
+
+packages:
+  common: !include include/common.yaml
+
+esp32:
+  board: esp32dev
+
+text_sensor:
+  - platform: template
+    name: "Keeloq Remote"
+    id: keeloq_remote
+#    on_value:
+#      - homeassistant.tag_scanned: !lambda |-
+#          return id(keeloq_remote).state;
+
+remote_receiver:
+  id: receiver
+  pin: 
+    number: GPIO22
+    mode: INPUT
+  tolerance: 30%
+  dump: keeloq
+  on_keeloq:
+    then:
+      - lambda: |-
+          char buff[20];
+          if (id(keeloq_crypter).decrypt(x)) {
+            snprintf(buff, sizeof(buff), "%07x:%1x:%08X:%c:%c", 
+                     x.address, x.command, x.encrypted, x.vlow ? 'L' : 'N', x.repeat ? 'R' : 'F');
+          } else {
+            snprintf(buff, sizeof(buff), "%07x:%1x", x.address, x.command);
+            // snprintf(buff, sizeof(buff), "%07x:%1x::%c:%c", 
+            //          x.address, x.command, x.vlow ? 'L' : 'N', x.repeat ? 'R' : 'F');
+          }
+          std::string buffAsStdStr = buff;
+          id(keeloq_remote).publish_state(buff);
+      - homeassistant.tag_scanned: !lambda 'return id(keeloq_remote).state.substr(0,9);'
+#      - script.execute: keeloq_remote_reset
+
+#hcs301:
+#  id: hcs301_id
+#  power_pin: PB_15
+#  clock_pin: PB_14
+#  pwm_pin: PB_13
+
+script:
+  - id: keeloq_remote_reset
+    mode: restart
+    then:
+      - delay: 500ms
+      - text_sensor.template.publish:
+          id: keeloq_remote
+          state: ""
+
+#  - id: trigger_hcs301
+#    mode: single
+#    then:
+#      - lambda: |-
+#          id(hcs301_id).transmitS2();
+#
+#  - id: program_hcs301
+#    mode: single
+#    then:
+#      - lambda: |-
+#          uint64_t hcs301_key = id(keeloq_crypter).normal_keygen(0x0DA342B);
+#          if (id(hcs301_id).program(0x0DA342B, 0x0, hcs301_key)) {
+#            ESP_LOGD("hcs301", "Successfully programmed");
+#          }
+
+keeloq_normal_crypter:
+  id: keeloq_crypter
+  manufacturer_key: !secret keeloq_manufacturer_key
+
