@@ -31,24 +31,35 @@ captive_portal:
 text_sensor:
   - platform: version
     name: "ESPHome Version"
+    entity_category: diagnostic
+
   - platform: wifi_info
     ip_address:
       name: "IP address"
+      entity_category: diagnostic
     ssid:
       name: "SSID"
+      entity_category: diagnostic
     bssid:
       name: "BSSID"
+      entity_category: diagnostic
 
 sensor:
   - platform: uptime
     name: "Uptime"
     device_class: duration
+    disabled_by_default: true
+    entity_category: diagnostic
 
   - platform: wifi_signal
     name: "WiFi Signal"
     update_interval: 60s
+    disabled_by_default: true
+    entity_category: diagnostic
 
 switch:
   - platform: restart
     name: "Restart"
+    entity_category: config
+
 
