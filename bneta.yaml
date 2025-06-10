@@ -6,3 +6,6 @@ packages:
   common: !include include/common.yaml
   bneta: !include devices/bneta_plug.yaml
 
+time: !remove
+web_server: !remove
+captive_portal: !remove
