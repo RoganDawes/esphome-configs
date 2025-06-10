@@ -7,7 +7,7 @@ packages:
   device: !include devices/sonoff_dual_r3.yaml
 
 light:
-   - id: !extend sw1
-     restore_mode: ALWAYS_ON
-   - id: !extend sw2
-     restore_mode: ALWAYS_ON
+  - id: !extend sw1
+    restore_mode: ALWAYS_ON
+  - id: !extend sw2
+    restore_mode: ALWAYS_ON
