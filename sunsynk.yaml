@@ -16,6 +16,8 @@ packages:
 logger:
   baud_rate: 0
 
+bluetooth_proxy:
+
 uart:
   - id: mod_bus
     tx_pin: GPIO5
