@@ -11,9 +11,15 @@ ota:
   platform: esphome
   password: !secret ota_password
 
+udp:
+  - addresses: !secret syslog_server
+    id: syslog_server
+
 time:
-  - platform: homeassistant
-    id: homeassistant_time
+  platform: sntp
+
+syslog:
+  udp_id: syslog_server
 
 wifi:
   ssid: !secret wifi_ssid
@@ -57,9 +63,12 @@ sensor:
     disabled_by_default: true
     entity_category: diagnostic
 
-switch:
+button:
   - platform: restart
     name: "Restart"
     entity_category: config
 
+  - platform: safe_mode
+    name: "Reboot to Safe Mode"
+    entity_category: config
 
