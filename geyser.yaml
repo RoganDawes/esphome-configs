@@ -17,6 +17,12 @@ packages:
   common: !include include/common.yaml
   sonoff: !include devices/sonoff_thr320.yaml
 
+esp32:
+  framework:
+    type: esp-idf
+
+bluetooth_proxy:
+
 switch:
   - id: !extend main_relay
     internal: true
