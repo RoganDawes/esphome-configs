@@ -21,6 +21,9 @@ esp32:
   framework:
     type: esp-idf
 
+logger:
+  level: DEBUG
+
 bluetooth_proxy:
 
 switch:
@@ -47,6 +50,23 @@ binary_sensor:
               - climate.control:
                   id: geyser_climate
                   mode: "HEAT"
+
+  - platform: template
+    id: temp_error
+    name: Sensor Failure
+    lambda: |-
+      return isnan(id(temp).state);
+    filters:
+      - delayed_on: 120s
+    on_press:
+      then:
+        - switch.turn_off: sensor_power
+        - delay: 5s
+        - switch.turn_on: sensor_power
+        - script.execute: delayed_restart
+    on_release:
+      then:
+        - script.stop: delayed_restart
 
 sensor:
   # Geyser temperature
@@ -157,3 +177,11 @@ script:
           id: geyser_climate
           mode: "HEAT"
 
+  - id: delayed_restart
+    then:
+      - delay: 180s
+      - button.press: internal_restart
+
+button:
+  - platform: restart
+    id: internal_restart
