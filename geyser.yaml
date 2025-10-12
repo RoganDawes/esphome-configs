@@ -30,6 +30,15 @@ switch:
   - id: !extend main_relay
     internal: true
 
+  - platform: template
+    id: master_switch
+    name: Master Switch
+    restore_mode: RESTORE_DEFAULT_ON
+    turn_off_action:
+      - climate.control:
+          id: geyser_climate
+          mode: "OFF"
+
 binary_sensor:
   # For someone in the ceiling, this can be used to turn the climate control
   # into OFF or HEAT modes. It does NOT directly control the relay.
@@ -160,6 +169,18 @@ climate:
         then:
           - logger.log: "Climate control ON"
           - light.turn_on: green_led
+    on_control:
+    - if:
+        condition:
+          lambda: |-
+            return !id(master_switch).state;
+        then:
+          lambda: |-
+            auto mode = x.get_mode();
+            if (mode.has_value() && mode.value() != CLIMATE_MODE_OFF) {
+              ESP_LOGI("lambda", "set_mode(%s) ignored because master switch is off", climate_mode_to_string(mode.value()));
+              x.set_mode(CLIMATE_MODE_OFF);
+            }
 
 script:
   - id: geyser_on
