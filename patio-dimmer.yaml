@@ -4,6 +4,9 @@ esphome:
   on_boot:
     - light.turn_on: 
         id: dimmer
+  platformio_options:
+    lib_ignore:
+      - RPAsyncTCP
 
 packages:
   common: !include include/common.yaml
