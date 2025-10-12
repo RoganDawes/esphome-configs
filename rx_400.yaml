@@ -11,6 +11,8 @@ packages:
 
 esp32:
   board: esp32dev
+  framework:
+    type: esp-idf
 
 text_sensor:
   - platform: template

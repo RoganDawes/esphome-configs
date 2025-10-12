@@ -7,12 +7,15 @@ packages:
 
 esp32:
   board: esp32dev
+  framework:
+    type: esp-idf
 
 # Override logging
 # logger:
 #   level: VERBOSE
 
 bluetooth_proxy:
+  active: true
 
 esp32_ble_tracker:
 

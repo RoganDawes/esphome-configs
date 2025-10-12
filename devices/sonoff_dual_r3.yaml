@@ -1,5 +1,7 @@
 esp32:
   board: esp32dev
+  framework:
+    type: esp-idf
 
 logger:
   hardware_uart: UART2
