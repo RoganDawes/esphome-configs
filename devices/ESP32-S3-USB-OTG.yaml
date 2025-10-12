@@ -1,0 +1,120 @@
+esp32:
+  board: esp32s3usbotg
+  framework:
+    type: esp-idf
+
+output:
+  - platform: gpio
+    id: USB_SEL_output
+    pin: GPIO18
+
+  - platform: ledc
+    id: LED_GREEN_output
+    pin: GPIO15
+
+  - platform: ledc
+    id: LED_YELLOW_output
+    pin: GPIO16
+
+  - platform: ledc
+    id: LCD_BACKLIGHT_output
+    pin: GPIO19
+
+  - platform: gpio
+    id: LIMIT_EN_output
+    pin: GPIO17
+
+  - platform: gpio
+    id: DEV_VBUS_EN_output
+    pin: GPIO12
+
+  - platform: gpio
+    id: BOOST_EN_output
+    pin: GPIO13
+
+display:
+  - platform: ili9xxx
+    id: lcd
+    model: st7789v
+    spi_id: spi_lcd
+    dc_pin: GPIO4
+    reset_pin: GPIO8
+    cs_pin: GPIO5
+    invert_colors: false
+
+light:
+  - platform: monochromatic
+    output: LCD_BACKLIGHT_output
+    id: backlight
+    restore_mode: ALWAYS_ON
+
+spi:
+  - id: spi_lcd
+    clk_pin: GPIO6
+    mosi_pin: GPIO7
+
+  - id: spi_sd
+    clk_pin: GPIO36
+    mosi_pin: GPIO38 # guess
+    miso_pin: GPIO37
+
+sensor:
+  - platform: adc
+    id: HOST_VOL
+    pin: GPIO1
+
+  - platform: adc
+    id: BAT_VOL
+    pin: GPIO2
+
+binary_sensor:
+  - platform: gpio
+    id: OVER_CURRENT
+    pin: GPIO21
+
+  - platform: gpio
+    id: BUTTON_OK
+    pin:
+      number: GPIO0
+      inverted: true
+
+  - platform: gpio
+    id: BUTTON_DW
+    pin:
+      number: GPIO11
+      inverted: true
+
+  - platform: gpio
+    id: BUTTON_UP
+    pin:
+      number: GPIO10
+      inverted: true
+
+  - platform: gpio
+    id: BUTTON_MENU
+    pin:
+      number: GPIO14
+      inverted: true
+
+select:
+  - platform: template
+    id: USB_SEL
+    optimistic: true
+    options:
+      - USB_DEV
+      - USB_HOST
+    initial_option: USB_DEV
+    on_value:
+      then:
+        - if:
+            condition:
+              - lambda: |-
+                  return x == "USB_DEV";
+            then:
+              - output.turn_off: USB_SEL_output
+              - output.turn_off: LIMIT_EN_output
+              - output.turn_off: DEV_VBUS_EN_output
+            else:
+              - output.turn_on: USB_SEL_output
+              - output.turn_on: LIMIT_EN_output
+              - output.turn_on: DEV_VBUS_EN_output

@@ -1,0 +1,68 @@
+esphome:
+  name: weatherxm
+
+external_components:
+  - source: github://RoganDawes/esphome-components
+    components: [weather_xm]
+    refresh: 1s
+  - source: github://pr#11196
+    components: [json]
+    refresh: 1h
+  - source: github://pr#11174
+    components: [usb_host, usb_uart]
+    refresh: 1h
+
+packages:
+  device: !include devices/ESP32-S3-USB-OTG.yaml
+  common: !include include/common.yaml
+
+select:
+  - id: !extend USB_SEL
+    initial_option: USB_HOST
+  
+logger:
+  hardware_uart: uart0
+  level: DEBUG
+  logs:
+    usb_host: INFO
+
+usb_host:
+  enable_hubs: true
+  max_transfer_requests: 32
+
+usb_uart:
+  - type: ch34x
+    vid: 0x1a86
+    pid: 0x7523
+    channels:
+      - id: uch_1
+        baud_rate: 115200
+        buffer_size: 2048
+
+json:
+
+weather_xm:
+  uart_id: uch_1
+  battery_voltage:
+    name: Battery Voltage
+  humidity:
+    name: Humidity
+  illuminance:
+    name: Illuminance
+  precipitation_accumulated:
+    name: Precipitation Accumulated
+  precipitation_rate:
+    name: Precipitation Rate
+  pressure:
+    name: Pressure
+  temperature:
+    name: Temperature
+  uv:
+    name: UV
+  uv_index:
+    name: UV Index
+  wind_speed:
+    name: Wind Speed
+  wind_direction_degrees:
+    name: Wind Direction
+
