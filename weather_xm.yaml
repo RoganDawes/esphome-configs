@@ -8,7 +8,7 @@ external_components:
   - source: github://pr#11196
     components: [json]
     refresh: 1h
-  - source: github://pr#11174
+  - source: github://pr#11548
     components: [usb_host, usb_uart]
     refresh: 1h
 
@@ -22,9 +22,7 @@ select:
   
 logger:
   hardware_uart: uart0
-  level: DEBUG
-  logs:
-    usb_host: INFO
+#  level: DEBUG
 
 usb_host:
   enable_hubs: true
