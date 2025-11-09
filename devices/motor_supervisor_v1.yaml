@@ -1,0 +1,69 @@
+esp32:
+  variant: esp32
+#  flash_size: 16MB
+  framework:
+    type: esp-idf
+
+binary_sensor:
+  - platform: gpio
+    id: in_1
+    pin:
+      number: GPIO21
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+  - platform: gpio
+    id: in_2
+    pin:
+      number: GPIO25
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+  - platform: gpio
+    id: in_3
+    pin:
+      number: GPIO26
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+  - platform: gpio
+    id: in_4
+    pin:
+      number: GPIO27
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+  - platform: gpio
+    id: motor_a
+    pin:
+      number: GPIO33
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+  - platform: gpio
+    id: motor_b
+    pin:
+      number: GPIO32
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+
+output:
+  - platform: gpio
+    id: out_1
+    pin: GPIO19
+  - platform: gpio
+    id: out_2
+    pin: GPIO18
+  - platform: gpio
+    id: out_3
+    pin: GPIO22
+  - platform: gpio
+    id: out_4
+    pin: GPIO23
