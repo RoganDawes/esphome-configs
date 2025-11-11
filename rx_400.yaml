@@ -18,9 +18,20 @@ text_sensor:
   - platform: template
     name: "Keeloq Remote"
     id: keeloq_remote
-#    on_value:
-#      - homeassistant.tag_scanned: !lambda |-
-#          return id(keeloq_remote).state;
+    filters:
+      lambda: |-
+        if (x == id(keeloq_remote).state) {
+          return {};
+        } else {
+          return x;
+        }
+    on_value:
+      - logger.log:
+          level: INFO
+          format: "Scanned Tag %s"
+          args: [ 'x.c_str()' ]
+      - homeassistant.tag_scanned: !lambda |-
+          return id(keeloq_remote).state.substr(0,9);
 
 remote_receiver:
   id: receiver
@@ -32,19 +43,15 @@ remote_receiver:
   on_keeloq:
     then:
       - lambda: |-
-          char buff[20];
+          char buff[30];
           if (id(keeloq_crypter).decrypt(x)) {
             snprintf(buff, sizeof(buff), "%07x:%1x:%08X:%c:%c", 
                      x.address, x.command, x.encrypted, x.vlow ? 'L' : 'N', x.repeat ? 'R' : 'F');
+            std::string buffAsStdStr = buff;
+            id(keeloq_remote).publish_state(buff);
           } else {
-            snprintf(buff, sizeof(buff), "%07x:%1x", x.address, x.command);
-            // snprintf(buff, sizeof(buff), "%07x:%1x::%c:%c", 
-            //          x.address, x.command, x.vlow ? 'L' : 'N', x.repeat ? 'R' : 'F');
+            ESP_LOGW("main", "Invalid Keeloq received: Address %04x, Command %1x, Encrypted %07x", x.address, x.command, x.encrypted);
           }
-          std::string buffAsStdStr = buff;
-          id(keeloq_remote).publish_state(buff);
-      - homeassistant.tag_scanned: !lambda 'return id(keeloq_remote).state.substr(0,9);'
-#      - script.execute: keeloq_remote_reset
 
 #hcs301:
 #  id: hcs301_id
