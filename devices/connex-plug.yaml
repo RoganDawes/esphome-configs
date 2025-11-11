@@ -26,6 +26,8 @@ sensor:
   power:
     name: Power
     id: power
+    filters:
+      delta: 0.1
   energy:
     name: Energy
   voltage_divider: 800
