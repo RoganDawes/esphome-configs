@@ -3,47 +3,28 @@ esphome:
   friendly_name: "Rogan's Garage"
 
 logger:
-  level: verbose
+#  level: verbose
 
 packages:
   device: !include devices/motor_supervisor_v1.yaml
   common: !include include/common.yaml
 
 binary_sensor:
-  - id: !extend in_1
-    name: IN 1
-    internal: true
-  - id: !extend in_2
-    name: IN 2
-    internal: true
-  - id: !extend in_3
-    name: IN 3
-    internal: true
-  - id: !extend in_4
-    name: IN 4
-    internal: true
-
   - id: !extend motor_a
-    name: Motor A
-    internal: true
     filters:
       - delayed_on: 100ms
 
   - id: !extend motor_b
-    name: Motor B
-    internal: true
     filters:
       - delayed_on: 100ms
 
   - platform: template
     id: open_movement
-    name: Open Movement
     lambda: |-
       return (id(motor_b).state && !id(close_movement).state);
 
   - platform: template
     id: close_movement
-    name: Close Movement
     lambda: |-
       return (id(motor_a).state && !id(open_movement).state);
 
@@ -51,7 +32,6 @@ button:
   - platform: output
     output: out_1
     id: trg
-    name: Trigger
     duration: 200ms
 
 # The cover exposed to Home Assistant, representing the door's motion
