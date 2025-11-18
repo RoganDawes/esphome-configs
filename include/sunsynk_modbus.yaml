@@ -9,13 +9,13 @@ interval:
           condition:
             time.has_time:
           then:
-            - script.execute: sync_time
+            - script.execute: ${id_prefix}sync_time
 
 script:
-  - id: sync_time
+  - id: ${id_prefix}sync_time
     then:
       - lambda: |-
-          esphome::modbus_controller::ModbusController *controller = id(inverter);
+          esphome::modbus_controller::ModbusController *controller = id(${modbus_controller_id});
           time_t now = ::time(nullptr);
           struct tm *time_info = ::localtime(&now);
           int seconds = time_info->tm_sec;
@@ -42,24 +42,24 @@ script:
 ############################################### BINARY SENSORS ########################################
 binary_sensor:
   - platform: modbus_controller            # 194 Grid Connected Status
-    modbus_controller_id: inverter
-    name: "Grid Connected Status"
-    id: inverter_esphome_grid_connected_status
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Grid Connected Status"
+    id: ${id_prefix}esphome_grid_connected_status
     register_type: holding
     address: 194
 
   - platform: modbus_controller           # 280 Gen Peak Shaving Status
-    modbus_controller_id: inverter
-    name: "Gen Peak Shaving Status"
-    id: inverter_esphome_gen_peak_shaving_status
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Gen Peak Shaving Status"
+    id: ${id_prefix}esphome_gen_peak_shaving_status
     register_type: holding
     address: 280
     bitmask: 0x10
 
   - platform: modbus_controller           # 280 Grid Peak Shaving Status
-    modbus_controller_id: inverter
-    name: "Grid Peak Shaving Status"
-    id: inverter_esphome_grid_peak_shaving_status
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Grid Peak Shaving Status"
+    id: ${id_prefix}esphome_grid_peak_shaving_status
     register_type: holding
     address: 280
     bitmask: 0x100
@@ -70,9 +70,9 @@ binary_sensor:
 ############################################### BATTERY ###############################################
 sensor:
   - platform: modbus_controller            # 182 Battery Temperature
-    modbus_controller_id: inverter
-    name: "Battery Temperature"
-    id: inverter_esphome_battery_temperature
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery Temperature"
+    id: ${id_prefix}esphome_battery_temperature
     register_type: holding
     address: 182
     unit_of_measurement: "°C"
@@ -85,9 +85,9 @@ sensor:
       - multiply: 0.1
 
   - platform: modbus_controller            # 183 Battery Voltage
-    modbus_controller_id: inverter
-    name: "Battery Voltage"
-    id: inverter_esphome_battery_voltage
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery Voltage"
+    id: ${id_prefix}esphome_battery_voltage
     register_type: holding
     address: 183
     unit_of_measurement: "V"
@@ -99,9 +99,9 @@ sensor:
     value_type: U_WORD
 
   - platform: modbus_controller            # 184 Battery SOC
-    modbus_controller_id: inverter
-    name: "Battery SOC"
-    id: inverter_esphome_battery_soc
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery SOC"
+    id: ${id_prefix}esphome_battery_soc
     register_type: holding
     address: 184
     unit_of_measurement: "%"
@@ -110,9 +110,9 @@ sensor:
     value_type: U_WORD
 
   - platform: modbus_controller            # 190 Battery Power
-    modbus_controller_id: inverter
-    name: "Battery Power"
-    id: inverter_esphome_battery_power
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery Power"
+    id: ${id_prefix}esphome_battery_power
     register_type: holding
     address: 190
     unit_of_measurement: "W"
@@ -121,9 +121,9 @@ sensor:
     value_type: S_WORD
 
   - platform: modbus_controller            # Battery Power Charge only needed if you want to calculate Daily Energy Totals using ESPHome
-    modbus_controller_id: inverter
-    name: "Battery Power Charge"
-    id: inverter_esphome_battery_power_charge
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery Power Charge"
+    id: ${id_prefix}esphome_battery_power_charge
     register_type: holding
     address: 190
     unit_of_measurement: "W"
@@ -135,9 +135,9 @@ sensor:
       if (x > 0) return 0; else return x *-1;
 
   - platform: modbus_controller            # Battery Power DisCharge only needed if you want to calculate Daily Energy Totals using ESPHome
-    modbus_controller_id: inverter
-    name: "Battery Power Discharge"
-    id: inverter_esphome_battery_power_discharge
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery Power Discharge"
+    id: ${id_prefix}esphome_battery_power_discharge
     register_type: holding
     address: 190
     unit_of_measurement: "W"
@@ -151,9 +151,9 @@ sensor:
 ######################################################################################################
 
   - platform: modbus_controller            # 191 Battery Current
-    modbus_controller_id: inverter
-    name: "Battery Current"
-    id: inverter_esphome_battery_current
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery Current"
+    id: ${id_prefix}esphome_battery_current
     register_type: holding
     address: 191
     unit_of_measurement: "A"
@@ -165,9 +165,9 @@ sensor:
       - multiply: 0.01
 
   - platform: modbus_controller            # 314 Battery Charge Limit Current
-    modbus_controller_id: inverter
-    name: "Battery Charge Limit Current"
-    id: inverter_esphome_battery_charge_limit_current
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery Charge Limit Current"
+    id: ${id_prefix}esphome_battery_charge_limit_current
     register_type: holding
     address: 314
     unit_of_measurement: "A"
@@ -177,9 +177,9 @@ sensor:
     value_type: S_WORD
 
   - platform: modbus_controller            # 315 Battery Discharge Limit Current
-    modbus_controller_id: inverter
-    name: "Battery Discharge Limit Current"
-    id: inverter_esphome_battery_discharge_limit_current
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery Discharge Limit Current"
+    id: ${id_prefix}esphome_battery_discharge_limit_current
     register_type: holding
     address: 315
     unit_of_measurement: "A"
@@ -191,9 +191,9 @@ sensor:
 # Battery capacity (if managed by BMS)
 
   - platform: modbus_controller            # 217 Battery Capacity Shutdown
-    modbus_controller_id: inverter
-    name: "Battery Capacity Shutdown"
-    id: inverter_esphome_battery_capacity_shutdown
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery Capacity Shutdown"
+    id: ${id_prefix}esphome_battery_capacity_shutdown
     register_type: holding
     address: 217
     unit_of_measurement: "%"
@@ -202,9 +202,9 @@ sensor:
     value_type: S_WORD
 
   - platform: modbus_controller            # 218 Battery Restart Capacity
-    modbus_controller_id: inverter
-    name: "Battery Restart Capacity"
-    id: inverter_esphome_battery_restart_capacity
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery Restart Capacity"
+    id: ${id_prefix}esphome_battery_restart_capacity
     register_type: holding
     address: 218
     unit_of_measurement: "%"
@@ -213,9 +213,9 @@ sensor:
     value_type: S_WORD
 
   - platform: modbus_controller            # 219 Battery Low Capacity
-    modbus_controller_id: inverter
-    name: "Battery Low Capacity"
-    id: inverter_esphome_battery_low_capacity
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery Low Capacity"
+    id: ${id_prefix}esphome_battery_low_capacity
     register_type: holding
     address: 219
     unit_of_measurement: "%"
@@ -226,9 +226,9 @@ sensor:
 # Battery voltage (if managed by voltage only)
 
   - platform: modbus_controller            # 220 Battery Shutdown voltage
-    modbus_controller_id: inverter
-    name: "Battery Shutdown voltage"
-    id: inverter_esphome_battery_shutdown_voltage
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery Shutdown voltage"
+    id: ${id_prefix}esphome_battery_shutdown_voltage
     register_type: holding
     address: 220
     unit_of_measurement: "V"
@@ -239,9 +239,9 @@ sensor:
       - multiply: 0.01
 
   - platform: modbus_controller            # 221 Battery Restart voltage
-    modbus_controller_id: inverter
-    name: "Battery Restart voltage"
-    id: inverter_esphome_battery_restart_voltage
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery Restart voltage"
+    id: ${id_prefix}esphome_battery_restart_voltage
     register_type: holding
     address: 221
     unit_of_measurement: "V"
@@ -252,9 +252,9 @@ sensor:
       - multiply: 0.01
 
   - platform: modbus_controller            # 222 Battery Low voltage
-    modbus_controller_id: inverter
-    name: "Battery Low voltage"
-    id: inverter_esphome_battery_low_voltage
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery Low voltage"
+    id: ${id_prefix}esphome_battery_low_voltage
     register_type: holding
     address: 222
     unit_of_measurement: "V"
@@ -265,9 +265,9 @@ sensor:
       - multiply: 0.01
 
   - platform: modbus_controller            # 201 Battery Equalization voltage
-    modbus_controller_id: inverter
-    name: "Battery Equalization voltage"
-    id: inverter_esphome_battery_equalisation_voltage
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery Equalization voltage"
+    id: ${id_prefix}esphome_battery_equalisation_voltage
     register_type: holding
     address: 201
     unit_of_measurement: "V"
@@ -278,9 +278,9 @@ sensor:
       - multiply: 0.01
 
   - platform: modbus_controller            # 202 Battery Absorption voltage
-    modbus_controller_id: inverter
-    name: "Battery Absorption voltage"
-    id: inverter_esphome_battery_absorbtion_voltage
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery Absorption voltage"
+    id: ${id_prefix}esphome_battery_absorbtion_voltage
     register_type: holding
     address: 202
     unit_of_measurement: "V"
@@ -291,9 +291,9 @@ sensor:
       - multiply: 0.01
 
   - platform: modbus_controller            # 203 Battery Float voltage
-    modbus_controller_id: inverter
-    name: "Battery Float voltage"
-    id: inverter_esphome_battery_float_voltage
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Battery Float voltage"
+    id: ${id_prefix}esphome_battery_float_voltage
     register_type: holding
     address: 203
     unit_of_measurement: "V"
@@ -306,9 +306,9 @@ sensor:
 ############################################### INVERTER ##############################################
 
   - platform: modbus_controller            # 175 Inverter Power
-    modbus_controller_id: inverter
-    name: "Inverter Power"
-    id: inverter_esphome_inverter_power
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Inverter Power"
+    id: ${id_prefix}esphome_inverter_power
     register_type: holding
     address: 175
     unit_of_measurement: "W"
@@ -317,9 +317,9 @@ sensor:
     value_type: S_WORD
 
   - platform: modbus_controller            # 154 Inverter Voltage
-    modbus_controller_id: inverter
-    name: "Inverter Voltage"
-    id: inverter_esphome_inverter_voltage
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Inverter Voltage"
+    id: ${id_prefix}esphome_inverter_voltage
     register_type: holding
     address: 154
     unit_of_measurement: "V"
@@ -331,9 +331,9 @@ sensor:
     value_type: U_WORD 
 
   - platform: modbus_controller            # 164 Inverter Current
-    modbus_controller_id: inverter
-    name: "Inverter Current"
-    id: inverter_esphome_inverter_current
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Inverter Current"
+    id: ${id_prefix}esphome_inverter_current
     register_type: holding
     address: 164
     unit_of_measurement: "A"
@@ -345,9 +345,9 @@ sensor:
       - multiply: 0.01
 
   - platform: modbus_controller            # 193 Inverter Frequency
-    modbus_controller_id: inverter
-    name: "Inverter Frequency"
-    id: inverter_esphome_inverter_frequency
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Inverter Frequency"
+    id: ${id_prefix}esphome_inverter_frequency
     register_type: holding
     address: 193
     unit_of_measurement: "Hz"
@@ -358,14 +358,14 @@ sensor:
     state_class: measurement
 
   - platform: template                     # Inverter Rated Power
-    name: "Rated Power"
-    id: inverter_esphome_rated_power
+    name: "${name_prefix}Rated Power"
+    id: ${id_prefix}esphome_rated_power
     unit_of_measurement: "W"
     accuracy_decimals: 0
     device_class: power
     lambda: |-
-      uint16_t low =  id(reg_16_raw).state;
-      uint16_t high =  id(reg_17_raw).state;
+      uint16_t low =  id(${id_prefix}reg_16_raw).state;
+      uint16_t high =  id(${id_prefix}reg_17_raw).state;
       return ( high << 16 | low);
     filters:
       - multiply: 0.1
@@ -374,9 +374,9 @@ sensor:
 ############################################### GRID ##################################################
 
   - platform: modbus_controller            # 079 Grid Frequency
-    modbus_controller_id: inverter
-    name: "Grid Frequency"
-    id: inverter_esphome_grid_frequency
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Grid Frequency"
+    id: ${id_prefix}esphome_grid_frequency
     register_type: holding
     address: 79
     unit_of_measurement: "Hz"
@@ -387,9 +387,9 @@ sensor:
     state_class: measurement
 
   - platform: modbus_controller            # 169 Grid Power
-    modbus_controller_id: inverter
-    name: "Grid Power"
-    id: inverter_esphome_grid_power_169
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Grid Power"
+    id: ${id_prefix}esphome_grid_power_169
     register_type: holding
     address: 169
     unit_of_measurement: "W"
@@ -399,9 +399,9 @@ sensor:
     value_type: S_WORD
 
   - platform: modbus_controller            # 167 Grid LD Power
-    modbus_controller_id: inverter
-    name: "Grid LD Power 167"
-    id: inverter_esphome_grid_power_167
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Grid LD Power 167"
+    id: ${id_prefix}esphome_grid_power_167
     register_type: holding
     address: 167
     unit_of_measurement: "W"
@@ -411,9 +411,9 @@ sensor:
     value_type: S_WORD
 
   - platform: modbus_controller            # 168 Grid L2 Power
-    modbus_controller_id: inverter
-    name: "Grid L2 Power 168"
-    id: inverter_esphome_grid_power_168
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Grid L2 Power 168"
+    id: ${id_prefix}esphome_grid_power_168
     register_type: holding
     address: 168
     unit_of_measurement: "W"
@@ -423,9 +423,9 @@ sensor:
     value_type: S_WORD
 
   - platform: modbus_controller            # 150 Grid Voltage
-    modbus_controller_id: inverter
-    name: "Grid Voltage"
-    id: inverter_esphome_grid_voltage
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Grid Voltage"
+    id: ${id_prefix}esphome_grid_voltage
     register_type: holding
     address: 150
     unit_of_measurement: "V"
@@ -437,9 +437,9 @@ sensor:
     value_type: U_WORD 
 
   - platform: modbus_controller            # 160 Grid Current
-    modbus_controller_id: inverter
-    name: "Grid Current"
-    id: inverter_esphome_grid_current
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Grid Current"
+    id: ${id_prefix}esphome_grid_current
     register_type: holding
     address: 160
     unit_of_measurement: "A"
@@ -451,9 +451,9 @@ sensor:
       - multiply: 0.01
 
   - platform: modbus_controller            # 172 Grid CT Power
-    modbus_controller_id: inverter
-    name: "Grid CT Power"
-    id: inverter_esphome_grid_ct_power
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Grid CT Power"
+    id: ${id_prefix}esphome_grid_ct_power
     register_type: holding
     address: 172
     unit_of_measurement: "W"
@@ -463,9 +463,9 @@ sensor:
     value_type: S_WORD
 
   - platform: modbus_controller            # Grid Power Import only needed if you want to calculate Daily Energy Totals using ESPHome
-    modbus_controller_id: inverter
-    name: "Grid Power Import"
-    id: inverter_esphome_grid_ct_power_import
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Grid Power Import"
+    id: ${id_prefix}esphome_grid_ct_power_import
     register_type: holding
     address: 172
     unit_of_measurement: "W"
@@ -478,12 +478,12 @@ sensor:
       if (x < 0) return 0; else return x;
 
   - platform: modbus_controller            # Grid Power Export only needed if you want to calculate Daily Energy Totals using ESPHome
-    modbus_controller_id: inverter
-    name: "Grid Power Export"
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Grid Power Export"
     register_type: holding
     address: 172
     unit_of_measurement: "W"
-    id: inverter_esphome_grid_ct_power_export
+    id: ${id_prefix}esphome_grid_ct_power_export
     accuracy_decimals: 0
     internal: true
     device_class: power
@@ -495,9 +495,9 @@ sensor:
 ############################################### LOAD ################################################
 
   - platform: modbus_controller            # 178 Load Power
-    modbus_controller_id: inverter
-    name: "Load Power"
-    id: inverter_esphome_load_power
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Load Power"
+    id: ${id_prefix}esphome_load_power
     register_type: holding
     address: 178
     unit_of_measurement: "W"
@@ -507,9 +507,9 @@ sensor:
     value_type: S_WORD
 
   - platform: modbus_controller            # 176 Load L1 Power
-    modbus_controller_id: inverter
-    name: "Load L1 Power"
-    id: inverter_esphome_load_l1_power
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Load L1 Power"
+    id: ${id_prefix}esphome_load_l1_power
     register_type: holding
     address: 176
     unit_of_measurement: "W"
@@ -519,9 +519,9 @@ sensor:
     value_type: S_WORD
 
   - platform: modbus_controller            # 177 Load L2 Power
-    modbus_controller_id: inverter
-    name: "Load L2 Power"
-    id: inverter_esphome_load_l2_power
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Load L2 Power"
+    id: ${id_prefix}esphome_load_l2_power
     register_type: holding
     address: 177
     unit_of_measurement: "W"
@@ -531,9 +531,9 @@ sensor:
     value_type: S_WORD
 
   - platform: modbus_controller            # 192 Load Frequency
-    modbus_controller_id: inverter
-    name: "Load Frequency"
-    id: inverter_esphome_load_frequency
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Load Frequency"
+    id: ${id_prefix}esphome_load_frequency
     register_type: holding
     address: 192
     unit_of_measurement: "Hz"
@@ -546,9 +546,9 @@ sensor:
 ############################################### SOLAR PV1 #############################################
 
   - platform: modbus_controller            # 186 PV1 Power
-    modbus_controller_id: inverter
-    name: "PV1 Power"
-    id: inverter_esphome_pv1_power
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}PV1 Power"
+    id: ${id_prefix}esphome_pv1_power
     register_type: holding
     address: 186
     unit_of_measurement: "W"
@@ -558,9 +558,9 @@ sensor:
     value_type: U_WORD
 
   - platform: modbus_controller            # 109 PV1 Voltage
-    modbus_controller_id: inverter
-    name: "PV1 Voltage"
-    id: inverter_esphome_pv1_voltage
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}PV1 Voltage"
+    id: ${id_prefix}esphome_pv1_voltage
     register_type: holding
     address: 109
     unit_of_measurement: "V"
@@ -572,9 +572,9 @@ sensor:
     value_type: U_WORD
 
   - platform: modbus_controller            # 110 PV1 Current
-    modbus_controller_id: inverter
-    name: "PV1 Current"
-    id: inverter_esphome_pv1_current
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}PV1 Current"
+    id: ${id_prefix}esphome_pv1_current
     register_type: holding
     address: 110
     unit_of_measurement: "A"
@@ -588,9 +588,9 @@ sensor:
 ############################################### SOLAR PV2 #############################################
 
   - platform: modbus_controller            # 187 PV2 Power
-    modbus_controller_id: inverter
-    name: "PV2 Power"
-    id: inverter_esphome_pv2_power
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}PV2 Power"
+    id: ${id_prefix}esphome_pv2_power
     register_type: holding
     address: 187
     unit_of_measurement: "W"
@@ -600,9 +600,9 @@ sensor:
     value_type: U_WORD
 
   - platform: modbus_controller            # 111 PV2 Voltage
-    modbus_controller_id: inverter
-    name: "PV2 Voltage"
-    id: inverter_esphome_pv2_voltage
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}PV2 Voltage"
+    id: ${id_prefix}esphome_pv2_voltage
     register_type: holding
     address: 111
     unit_of_measurement: "V"
@@ -614,9 +614,9 @@ sensor:
     value_type: U_WORD
 
   - platform: modbus_controller            # 112 PV2 Current
-    modbus_controller_id: inverter
-    name: "PV2 Current"
-    id: inverter_esphome_pv2_current
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}PV2 Current"
+    id: ${id_prefix}esphome_pv2_current
     register_type: holding
     address: 112
     unit_of_measurement: "A"
@@ -631,9 +631,9 @@ sensor:
 #### Uncomment this if you have a third MPPT single phase
     
   #- platform: modbus_controller            # 188 PV3 Power
-  #  modbus_controller_id: inverter
-  #  name: "PV3 Power"
-  #  id: inverter_esphome_pv3_power
+  #  modbus_controller_id: ${modbus_controller_id}
+  #  name: "${name_prefix}PV3 Power"
+  #  id: ${id_prefix}esphome_pv3_power
   #  register_type: holding
   #  address: 188
   #  unit_of_measurement: "W"
@@ -643,9 +643,9 @@ sensor:
   #  value_type: U_WORD
 
   #- platform: modbus_controller            # 113 PV3 Voltage
-  #  modbus_controller_id: inverter
-  #  name: "PV3 Voltage"
-  #  id: inverter_esphome_pv3_voltage
+  #  modbus_controller_id: ${modbus_controller_id}
+  #  name: "${name_prefix}PV3 Voltage"
+  #  id: ${id_prefix}esphome_pv3_voltage
   #  register_type: holding
   #  address: 113
   #  unit_of_measurement: "V"
@@ -657,9 +657,9 @@ sensor:
   #  value_type: U_WORD
 
   #- platform: modbus_controller            # 114 PV3 Current
-  #  modbus_controller_id: inverter
-  #  name: "PV3 Current"
-  #  id: inverter_esphome_pv3_current
+  #  modbus_controller_id: ${modbus_controller_id}
+  #  name: "${name_prefix}PV3 Current"
+  #  id: ${id_prefix}esphome_pv3_current
   #  register_type: holding
   #  address: 114
   #  unit_of_measurement: "A"
@@ -674,9 +674,9 @@ sensor:
 # Choose one below
 
   - platform: template                     # Sum of PV1 and PV2 to get total PV Power
-    name: "Solar Power"
+    name: "${name_prefix}Solar Power"
     unit_of_measurement: "W"
-    id: inverter_esphome_pv_total
+    id: ${id_prefix}esphome_pv_total
     accuracy_decimals: 0
     device_class: power
     state_class: measurement
@@ -685,9 +685,9 @@ sensor:
     update_interval: 5s
     
   #- platform: template                     # Sum of PV1, PV2 and PV3 to get total PV Power
-  #  name: "Solar Power"
+  #  name: "${name_prefix}Solar Power"
   #  unit_of_measurement: "W"
-  #  id: inverter_esphome_pv_total
+  #  id: ${id_prefix}esphome_pv_total
   #  accuracy_decimals: 0
   #  device_class: power
   #  state_class: measurement
@@ -698,9 +698,9 @@ sensor:
 ############################################### OUTPUTS ###############################################
 
   - platform: modbus_controller            # 166 Aux Power
-    modbus_controller_id: inverter
-    name: "AUX Power"
-    id: inverter_esphome_aux_power
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}AUX Power"
+    id: ${id_prefix}esphome_aux_power
     register_type: holding
     address: 166
     unit_of_measurement: "W"
@@ -710,7 +710,7 @@ sensor:
     value_type: S_WORD
 
   - platform: template                     # Essential Power based on register 175 + 167 - 166
-    name: "Essential Power"
+    name: "${name_prefix}Essential Power"
     unit_of_measurement: "W"
     accuracy_decimals: 0
     device_class: power
@@ -720,7 +720,7 @@ sensor:
     update_interval: 5s
 
   - platform: template                     # Essential Power1 based on register 175 + 169 - 166
-    name: "Essential Power 1"
+    name: "${name_prefix}Essential Power 1"
     unit_of_measurement: "W"
     accuracy_decimals: 0
     device_class: power
@@ -730,7 +730,7 @@ sensor:
     update_interval: 5s
 
   - platform: template                     # Nonessential Power 172 - 167
-    name: "Nonessential Power"
+    name: "${name_prefix}Nonessential Power"
     unit_of_measurement: "W"
     accuracy_decimals: 0
     device_class: power
@@ -740,7 +740,7 @@ sensor:
     update_interval: 5s
 
   - platform: template                     # Nonessential Power1 172 - 169
-    name: "Nonessential Power 1"
+    name: "${name_prefix}Nonessential Power 1"
     unit_of_measurement: "W"
     accuracy_decimals: 0
     device_class: power
@@ -753,9 +753,9 @@ sensor:
 ############################################### ENERGY ################################################
 
   - platform: modbus_controller            # 070 Day Battery Charge
-    modbus_controller_id: inverter
-    name: "Day Battery Charge"
-    id: inverter_esphome_day_battery_charge
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Day Battery Charge"
+    id: ${id_prefix}esphome_day_battery_charge
     register_type: holding
     address: 70
     unit_of_measurement: "kWh"
@@ -767,9 +767,9 @@ sensor:
       - multiply: 0.1
 
   - platform: modbus_controller            # 071 Day Battery Discharge
-    modbus_controller_id: inverter
-    name: "Day Battery Discharge"
-    id: inverter_esphome_day_battery_discharge
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Day Battery Discharge"
+    id: ${id_prefix}esphome_day_battery_discharge
     register_type: holding
     address: 71
     unit_of_measurement: "kWh"
@@ -781,9 +781,9 @@ sensor:
       - multiply: 0.1
 
   - platform: modbus_controller            # 072 Total Battery Charge
-    modbus_controller_id: inverter
-    name: "Total Battery Charge"
-    id: inverter_esphome_total_battery_charge
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Total Battery Charge"
+    id: ${id_prefix}esphome_total_battery_charge
     register_type: holding
     address: 72
     unit_of_measurement: "kWh"
@@ -795,9 +795,9 @@ sensor:
      - multiply: 0.1
 
   - platform: modbus_controller            # 074 Total Battery Discharge
-    modbus_controller_id: inverter
-    name: "Total Battery Discharge"
-    id: inverter_esphome_total_battery_discharge
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Total Battery Discharge"
+    id: ${id_prefix}esphome_total_battery_discharge
     register_type: holding
     address: 74
     unit_of_measurement: "kWh"
@@ -809,9 +809,9 @@ sensor:
      - multiply: 0.1
 
   - platform: modbus_controller            # 076 Day Grid Import
-    modbus_controller_id: inverter
-    name: "Day Grid Import"
-    id: inverter_esphome_day_grid_import
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Day Grid Import"
+    id: ${id_prefix}esphome_day_grid_import
     register_type: holding
     address: 76
     unit_of_measurement: "kWh"
@@ -823,9 +823,9 @@ sensor:
       - multiply: 0.1
 
   - platform: modbus_controller            # 077 Day Grid Export
-    modbus_controller_id: inverter
-    name: "Day Grid Export"
-    id: inverter_esphome_day_grid_export
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Day Grid Export"
+    id: ${id_prefix}esphome_day_grid_export
     register_type: holding
     address: 77
     unit_of_measurement: "kWh"
@@ -837,9 +837,9 @@ sensor:
       - multiply: 0.1
 
   - platform: modbus_controller            # 078 Total Grid Import
-    modbus_controller_id: inverter
-    name: "Total Grid Import"
-    id: inverter_esphome_total_grid_import
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Total Grid Import"
+    id: ${id_prefix}esphome_total_grid_import
     register_type: holding
     address: 78
     unit_of_measurement: "kWh"
@@ -851,9 +851,9 @@ sensor:
       - multiply: 0.1
 
   - platform: modbus_controller            # 081 Total Grid Export
-    modbus_controller_id: inverter
-    name: "Total Grid Export"
-    id: inverter_esphome_total_grid_export
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Total Grid Export"
+    id: ${id_prefix}esphome_total_grid_export
     register_type: holding
     address: 81
     unit_of_measurement: "kWh"
@@ -865,9 +865,9 @@ sensor:
       - multiply: 0.1
 
   - platform: modbus_controller            # 084 Day Load Energy
-    modbus_controller_id: inverter
-    name: "Day Load Energy"
-    id: inverter_esphome_day_load_energy
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Day Load Energy"
+    id: ${id_prefix}esphome_day_load_energy
     register_type: holding
     address: 84
     unit_of_measurement: "kWh"
@@ -879,9 +879,9 @@ sensor:
     value_type: U_WORD
 
   - platform: modbus_controller            # 085 Total Load Energy
-    modbus_controller_id: inverter
-    name: "Total Load Energy"
-    id: inverter_esphome_total_load_energy
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Total Load Energy"
+    id: ${id_prefix}esphome_total_load_energy
     register_type: holding
     address: 85
     unit_of_measurement: "kWh"
@@ -893,9 +893,9 @@ sensor:
       - multiply: 0.1
 
   - platform: modbus_controller            # 096 Total PV Energy
-    modbus_controller_id: inverter
-    name: "Total PV Energy"
-    id: inverter_esphome_total_pv_energy
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Total PV Energy"
+    id: ${id_prefix}esphome_total_pv_energy
     register_type: holding
     address: 96
     unit_of_measurement: "kWh"
@@ -907,9 +907,9 @@ sensor:
     value_type: U_DWORD_R  
 
   - platform: modbus_controller            # 108 Day PV Energy
-    modbus_controller_id: inverter
-    name: "Day PV Energy"
-    id: inverter_esphome_day_pv_energy
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Day PV Energy"
+    id: ${id_prefix}esphome_day_pv_energy
     register_type: holding
     address: 108
     unit_of_measurement: "kWh"
@@ -925,7 +925,7 @@ sensor:
 ##### You can comment these out if not needed
 
   - platform: total_daily_energy           # Day PV Energy
-    name: "Day PV Energy Local"
+    name: "${name_prefix}Day PV Energy Local"
     power_id: inverter_esphome_pv_total
     unit_of_measurement: 'kWh'
     state_class: total_increasing
@@ -937,7 +937,7 @@ sensor:
       - multiply: 0.001
 
   - platform: total_daily_energy           # Day Battery Charge Energy
-    name: "Day Battery Charge Energy Local"
+    name: "${name_prefix}Day Battery Charge Energy Local"
     power_id: inverter_esphome_battery_power_charge
     unit_of_measurement: 'kWh'
     state_class: total_increasing
@@ -949,7 +949,7 @@ sensor:
       - multiply: 0.001
 
   - platform: total_daily_energy           # Day Battery DisCharge Energy
-    name: "Day Battery Discharge Energy Local"
+    name: "${name_prefix}Day Battery Discharge Energy Local"
     power_id: inverter_esphome_battery_power_discharge
     unit_of_measurement: 'kWh'
     state_class: total_increasing
@@ -961,7 +961,7 @@ sensor:
       - multiply: 0.001
 
   - platform: total_daily_energy           # Day Load Energy
-    name: "Day Load Energy Local"
+    name: "${name_prefix}Day Load Energy Local"
     power_id: inverter_esphome_load_power
     unit_of_measurement: 'kWh'
     state_class: total_increasing
@@ -973,7 +973,7 @@ sensor:
       - multiply: 0.001
 
   - platform: total_daily_energy           # Day Grid Import Energy
-    name: "Day Grid Import Energy Local"
+    name: "${name_prefix}Day Grid Import Energy Local"
     power_id: inverter_esphome_grid_ct_power_import
     unit_of_measurement: 'kWh'
     state_class: total_increasing
@@ -985,7 +985,7 @@ sensor:
       - multiply: 0.001
 
   - platform: total_daily_energy           # Day Grid Export Energy
-    name: "Day Grid Export Energy Local"
+    name: "${name_prefix}Day Grid Export Energy Local"
     power_id: inverter_esphome_grid_ct_power_export
     unit_of_measurement: 'kWh'
     state_class: total_increasing
@@ -999,9 +999,9 @@ sensor:
 ############################################### TEMPERATURE ################################################
 
   - platform: modbus_controller            # 090 DC Transformer Temperature
-    modbus_controller_id: inverter
-    name: "DC Transformer Temperature"
-    id: inverter_esphome_dc_transformer_temperature
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}DC Transformer Temperature"
+    id: ${id_prefix}esphome_dc_transformer_temperature
     register_type: holding
     address: 090
     unit_of_measurement: "°C"
@@ -1014,9 +1014,9 @@ sensor:
       - multiply:  0.1
 
   - platform: modbus_controller            # 091 Radiator Temperature
-    modbus_controller_id: inverter
-    name: "Radiator Temperature"
-    id: inverter_esphome_radiator_temperature
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Radiator Temperature"
+    id: ${id_prefix}esphome_radiator_temperature
     register_type: holding
     address: 091
     unit_of_measurement: "°C"
@@ -1031,54 +1031,54 @@ sensor:
 ################################################ READ SETTINGS #############################################
 
   - platform: modbus_controller            # 250 Prog1 Time
-    modbus_controller_id: inverter
-    name: "Prog1 Time"
-    id: inverter_esphome_system_mode_time1
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Prog1 Time"
+    id: ${id_prefix}esphome_system_mode_time1
     register_type: holding
     skip_updates: ${settings_skipped_updates}
     address: 250
     icon: "mdi:clock"
 
   - platform: modbus_controller            # 251 Prog2 Time
-    modbus_controller_id: inverter
-    name: "Prog2 Time"
-    id: inverter_esphome_system_mode_time2
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Prog2 Time"
+    id: ${id_prefix}esphome_system_mode_time2
     register_type: holding
     skip_updates: ${settings_skipped_updates}
     address: 251   
     icon: "mdi:clock"
 
   - platform: modbus_controller            # 252 Prog3 Time
-    modbus_controller_id: inverter
-    name: "Prog3 Time"
-    id: inverter_esphome_system_mode_time3
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Prog3 Time"
+    id: ${id_prefix}esphome_system_mode_time3
     register_type: holding
     skip_updates: ${settings_skipped_updates}
     address: 252
     icon: "mdi:clock"
 
   - platform: modbus_controller            # 253 Prog4 Time
-    modbus_controller_id: inverter
-    name: "Prog4 Time"
-    id: inverter_esphome_system_mode_time4
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Prog4 Time"
+    id: ${id_prefix}esphome_system_mode_time4
     register_type: holding
     skip_updates: ${settings_skipped_updates}
     address: 253
     icon: "mdi:clock"
 
   - platform: modbus_controller            # 254 Prog5 Time
-    modbus_controller_id: inverter
-    name: "Prog5 Time"
-    id: inverter_esphome_system_mode_time5
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Prog5 Time"
+    id: ${id_prefix}esphome_system_mode_time5
     register_type: holding
     skip_updates: ${settings_skipped_updates}
     address: 254
     icon: "mdi:clock"
 
   - platform: modbus_controller            # 255 Prog6 Time
-    modbus_controller_id: inverter
-    name: "Prog6 Time"
-    id: inverter_esphome_system_mode_time6
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Prog6 Time"
+    id: ${id_prefix}esphome_system_mode_time6
     register_type: holding
     skip_updates: ${settings_skipped_updates}
     address: 255
@@ -1087,64 +1087,64 @@ sensor:
 ################################################ SAVE RAW REGISTERS ############################################
 
   - platform: modbus_controller            # 255 Grid Peak Shaving raw register value
-    modbus_controller_id: inverter
-    id: grid_peak_shaving_raw
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}grid_peak_shaving_raw
     register_type: holding
     address: 280
     value_type: U_WORD
     internal: true
 
   - platform: modbus_controller            # 274 raw register value
-    modbus_controller_id: inverter
-    id: reg_274_raw
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}reg_274_raw
     register_type: holding
     address: 274
     value_type: U_WORD
     internal: true
 
   - platform: modbus_controller            # 275 raw register value
-    modbus_controller_id: inverter
-    id: reg_275_raw
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}reg_275_raw
     register_type: holding
     address: 275
     value_type: U_WORD
     internal: true
 
   - platform: modbus_controller            # 276 raw register value
-    modbus_controller_id: inverter
-    id: reg_276_raw
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}reg_276_raw
     register_type: holding
     address: 276
     value_type: U_WORD
     internal: true
 
   - platform: modbus_controller            # 277 raw register value
-    modbus_controller_id: inverter
-    id: reg_277_raw
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}reg_277_raw
     register_type: holding
     address: 277
     value_type: U_WORD
     internal: true
 
   - platform: modbus_controller            # 278 raw register value
-    modbus_controller_id: inverter
-    id: reg_278_raw
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}reg_278_raw
     register_type: holding
     address: 278
     value_type: U_WORD
     internal: true
 
   - platform: modbus_controller            # 279 raw register value
-    modbus_controller_id: inverter
-    id: reg_279_raw
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}reg_279_raw
     register_type: holding
     address: 279
     value_type: U_WORD
     internal: true
 
   - platform: modbus_controller            # 16 raw register value
-    modbus_controller_id: inverter
-    id: reg_16_raw
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}reg_16_raw
     register_type: holding
     address: 16
     value_type: U_WORD
@@ -1152,8 +1152,8 @@ sensor:
     skip_updates: ${settings_skipped_updates}
 
   - platform: modbus_controller            # 17 raw register value
-    modbus_controller_id: inverter
-    id: reg_17_raw
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}reg_17_raw
     register_type: holding
     address: 17
     value_type: U_WORD
@@ -1165,9 +1165,9 @@ sensor:
 switch:
   - platform: modbus_controller            # 232 Toggle Grid Charge
     use_write_multiple: true
-    modbus_controller_id: inverter
-    name: "Toggle Grid Charge"
-    id: inverter_esphome_toggle_grid_charge
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Toggle Grid Charge"
+    id: ${id_prefix}esphome_toggle_grid_charge
     register_type: holding
     address: 232
     bitmask: 1
@@ -1175,9 +1175,9 @@ switch:
 
   - platform: modbus_controller            # 231 Toggle Generator Charge
     use_write_multiple: true
-    modbus_controller_id: inverter
-    name: "Toggle Generator Charge"
-    id: inverter_esphome_toggle_generator_charge
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Toggle Generator Charge"
+    id: ${id_prefix}esphome_toggle_generator_charge
     register_type: holding
     address: 231
     bitmask: 1
@@ -1185,9 +1185,9 @@ switch:
 
   - platform: modbus_controller            # 326 Toggle Force Generator
     use_write_multiple: true
-    modbus_controller_id: inverter
-    name: "Toggle Force Generator"
-    id: inverter_esphome_toggle_force_generator
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Toggle Force Generator"
+    id: ${id_prefix}esphome_toggle_force_generator
     register_type: holding
     address: 326
     bitmask: 8192 # 2^13 to target bit 13
@@ -1195,9 +1195,9 @@ switch:
     
   - platform: modbus_controller            # 247 Toggle Solar Sell
     use_write_multiple: true
-    modbus_controller_id: inverter
-    name: "Toggle Solar sell"
-    id: inverter_esphome_toggle_solar_sell
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Toggle Solar sell"
+    id: ${id_prefix}esphome_toggle_solar_sell
     register_type: holding
     address: 247
     bitmask: 1
@@ -1205,9 +1205,9 @@ switch:
 
   - platform: modbus_controller            # 248 Toggle System Timer
     use_write_multiple: true
-    modbus_controller_id: inverter
-    name: "Toggle System Timer" 
-    id: inverter_esphome_toggle_Time_of_Use
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Toggle System Timer" 
+    id: ${id_prefix}esphome_toggle_Time_of_Use
     register_type: holding
     address: 248
     bitmask: 1
@@ -1215,9 +1215,9 @@ switch:
 
   - platform: modbus_controller            # 243 Priority Load
     use_write_multiple: true
-    modbus_controller_id: inverter
-    name: "Toggle Priority Load" 
-    id: inverter_esphome_toggle_priority_load
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Toggle Priority Load" 
+    id: ${id_prefix}esphome_toggle_priority_load
     register_type: holding
     address: 243
     bitmask: 1
@@ -1225,59 +1225,59 @@ switch:
 
   - platform: modbus_controller            # 274 Prog1 Charge
     use_write_multiple: true
-    modbus_controller_id: inverter
-    name: "Prog1 Grid Charge"
-    id: inverter_esphome_toggle_grid_charge_time1
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Prog1 Grid Charge"
+    id: ${id_prefix}esphome_toggle_grid_charge_time1
     register_type: holding
     address: 274
     bitmask: 1
     icon: "mdi:toggle-switch"
 
   - platform: modbus_controller            # 275 Prog2 Charge
-    modbus_controller_id: inverter
+    modbus_controller_id: ${modbus_controller_id}
     use_write_multiple: true
-    name: "Prog2 Grid Charge"
-    id: inverter_esphome_toggle_grid_charge_time2
+    name: "${name_prefix}Prog2 Grid Charge"
+    id: ${id_prefix}esphome_toggle_grid_charge_time2
     register_type: holding
     address: 275
     bitmask: 1
     icon: "mdi:toggle-switch"
 
   - platform: modbus_controller            # 276 Prog3 Charge
-    modbus_controller_id: inverter
+    modbus_controller_id: ${modbus_controller_id}
     use_write_multiple: true
-    name: "Prog3 Grid Charge"
-    id: inverter_esphome_toggle_grid_charge_time3
+    name: "${name_prefix}Prog3 Grid Charge"
+    id: ${id_prefix}esphome_toggle_grid_charge_time3
     register_type: holding
     address: 276
     bitmask: 1
     icon: "mdi:toggle-switch"
 
   - platform: modbus_controller            # 277 Prog4 Charge
-    modbus_controller_id: inverter
+    modbus_controller_id: ${modbus_controller_id}
     use_write_multiple: true
-    name: "Prog4 Grid Charge"
-    id: inverter_esphome_toggle_grid_charge_time4
+    name: "${name_prefix}Prog4 Grid Charge"
+    id: ${id_prefix}esphome_toggle_grid_charge_time4
     register_type: holding
     address: 277
     bitmask: 1
     icon: "mdi:toggle-switch"
 
   - platform: modbus_controller            # Prog5 Charge
-    modbus_controller_id: inverter
+    modbus_controller_id: ${modbus_controller_id}
     use_write_multiple: true
-    name: "Prog5 Grid Charge"
-    id: inverter_esphome_toggle_grid_charge_time5
+    name: "${name_prefix}Prog5 Grid Charge"
+    id: ${id_prefix}esphome_toggle_grid_charge_time5
     register_type: holding
     address: 278
     bitmask: 1
     icon: "mdi:toggle-switch"
 
   - platform: modbus_controller            # 279 Prog6 Charge
-    modbus_controller_id: inverter
+    modbus_controller_id: ${modbus_controller_id}
     use_write_multiple: true
-    name: "Prog6 Grid Charge"
-    id: inverter_esphome_toggle_grid_charge_time6
+    name: "${name_prefix}Prog6 Grid Charge"
+    id: ${id_prefix}esphome_toggle_grid_charge_time6
     register_type: holding
     address: 279
     bitmask: 1
@@ -1286,9 +1286,9 @@ switch:
 number:
   - platform: modbus_controller            # 268 Prog1 Capacity
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_soc_time1
-    name: "Prog1 Capacity"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_soc_time1
+    name: "${name_prefix}Prog1 Capacity"
     unit_of_measurement: "%"
     address: 268
     min_value: 0
@@ -1298,9 +1298,9 @@ number:
 
   - platform: modbus_controller            # 269 Prog2 Capacity
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_soc_time2
-    name: "Prog2 Capacity"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_soc_time2
+    name: "${name_prefix}Prog2 Capacity"
     unit_of_measurement: "%"
     address: 269
     min_value: 0
@@ -1310,9 +1310,9 @@ number:
 
   - platform: modbus_controller            # 270 Prog3 Capacity
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_soc_time3
-    name: "Prog3 Capacity"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_soc_time3
+    name: "${name_prefix}Prog3 Capacity"
     unit_of_measurement: "%"
     address: 270
     min_value: 0
@@ -1322,9 +1322,9 @@ number:
 
   - platform: modbus_controller            # 271 Prog4 Capacity
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_soc_time4
-    name: "Prog4 Capacity"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_soc_time4
+    name: "${name_prefix}Prog4 Capacity"
     unit_of_measurement: "%"
     address: 271
     min_value: 0
@@ -1334,9 +1334,9 @@ number:
 
   - platform: modbus_controller            # 272 Prog5 Capacity
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_soc_time5
-    name: "Prog5 Capacity"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_soc_time5
+    name: "${name_prefix}Prog5 Capacity"
     unit_of_measurement: "%"
     address: 272
     min_value: 0
@@ -1346,9 +1346,9 @@ number:
 
   - platform: modbus_controller            # 273 Prog6 Capacity
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_soc_time6
-    name: "Prog6 Capacity"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_soc_time6
+    name: "${name_prefix}Prog6 Capacity"
     unit_of_measurement: "%"
     address: 273
     min_value: 0
@@ -1358,9 +1358,9 @@ number:
 
   - platform: modbus_controller            # 256 Prog1 Power
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_power_time1
-    name: "Prog1 Power"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_power_time1
+    name: "${name_prefix}Prog1 Power"
     unit_of_measurement: "W"
     address: 256
     min_value: 0
@@ -1370,9 +1370,9 @@ number:
 
   - platform: modbus_controller            # 257 Prog2 Power
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_power_time2
-    name: "Prog2 Power"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_power_time2
+    name: "${name_prefix}Prog2 Power"
     unit_of_measurement: "W"
     address: 257
     min_value: 0
@@ -1382,9 +1382,9 @@ number:
 
   - platform: modbus_controller            # 258 Prog3 Power
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_power_time3
-    name: "Prog3 Power"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_power_time3
+    name: "${name_prefix}Prog3 Power"
     unit_of_measurement: "W"
     address: 258
     min_value: 0
@@ -1394,9 +1394,9 @@ number:
 
   - platform: modbus_controller            # 259 Prog4 Power
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_power_time4
-    name: "Prog4 Power"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_power_time4
+    name: "${name_prefix}Prog4 Power"
     unit_of_measurement: "W"
     address: 259
     min_value: 0
@@ -1406,9 +1406,9 @@ number:
 
   - platform: modbus_controller            # 260 Prog5 Power
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_power_time5
-    name: "Prog5 Power"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_power_time5
+    name: "${name_prefix}Prog5 Power"
     unit_of_measurement: "W"
     address: 260
     min_value: 0
@@ -1418,9 +1418,9 @@ number:
 
   - platform: modbus_controller            # 261 Prog6 Power
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_power_time6
-    name: "Prog6 Power"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_power_time6
+    name: "${name_prefix}Prog6 Power"
     unit_of_measurement: "W"
     address: 261
     min_value: 0
@@ -1430,9 +1430,9 @@ number:
 
   - platform: modbus_controller            # 262 Prog1 Voltage
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_voltage_time1
-    name: "Prog1 Voltage"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_voltage_time1
+    name: "${name_prefix}Prog1 Voltage"
     unit_of_measurement: "V"
     address: 262
     min_value: 41
@@ -1445,9 +1445,9 @@ number:
 
   - platform: modbus_controller            # 263 Prog2 Voltage
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_voltage_time2
-    name: "Prog2 Voltage"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_voltage_time2
+    name: "${name_prefix}Prog2 Voltage"
     unit_of_measurement: "V"
     address: 263
     min_value: 41
@@ -1460,9 +1460,9 @@ number:
 
   - platform: modbus_controller            # 264 Prog3 Voltage
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_voltage_time3
-    name: "Prog3 Voltage"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_voltage_time3
+    name: "${name_prefix}Prog3 Voltage"
     unit_of_measurement: "V"
     address: 264
     min_value: 41
@@ -1475,9 +1475,9 @@ number:
 
   - platform: modbus_controller            # 265 Prog4 Voltage
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_voltage_time4
-    name: "Prog4 Voltage"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_voltage_time4
+    name: "${name_prefix}Prog4 Voltage"
     unit_of_measurement: "V"
     address: 265
     min_value: 41
@@ -1490,9 +1490,9 @@ number:
 
   - platform: modbus_controller            # 266 Prog5 Voltage
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_voltage_time5
-    name: "Prog5 Voltage"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_voltage_time5
+    name: "${name_prefix}Prog5 Voltage"
     unit_of_measurement: "V"
     address: 266
     min_value: 41
@@ -1505,9 +1505,9 @@ number:
 
   - platform: modbus_controller            # 267 Prog6 Voltage
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_set_voltage_time6
-    name: "Prog6 Voltage"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_set_voltage_time6
+    name: "${name_prefix}Prog6 Voltage"
     unit_of_measurement: "V"
     address: 267
     min_value: 41
@@ -1520,9 +1520,9 @@ number:
 
   - platform: modbus_controller            # 230 Grid Charge Battery current
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_grid_charge_bat_current
-    name: "Grid Charge Battery current"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_grid_charge_bat_current
+    name: "${name_prefix}Grid Charge Battery current"
     unit_of_measurement: "A"
     address: 230
     min_value: 0
@@ -1532,9 +1532,9 @@ number:
 
   - platform: modbus_controller            # 210 Battery Max Charge current
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_bat_max_charge_current
-    name: "Battery Max Charge current"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_bat_max_charge_current
+    name: "${name_prefix}Battery Max Charge current"
     unit_of_measurement: "A"
     address: 210
     min_value: 0
@@ -1544,9 +1544,9 @@ number:
 
   - platform: modbus_controller            # 211 Battery Max Discharge current
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_bat_max_discharge_current
-    name: "Battery Max Discharge current"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_bat_max_discharge_current
+    name: "${name_prefix}Battery Max Discharge current"
     unit_of_measurement: "A"
     address: 211
     min_value: 0
@@ -1556,9 +1556,9 @@ number:
 
   - platform: modbus_controller            # 293 Grid Peak Shaving Power
     use_write_multiple: true
-    modbus_controller_id: inverter
-    name: "Grid Peak shaving power"
-    id: inverter_grid_peak_shaving_power
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Grid Peak shaving power"
+    id: ${id_prefix}grid_peak_shaving_power
     address: 293
     unit_of_measurement: "W"
     min_value: 0
@@ -1568,9 +1568,9 @@ number:
 
   - platform: modbus_controller            # 245 Max Sell Power
     use_write_multiple: true
-    modbus_controller_id: inverter
-    name: "Max Sell power"
-    id: inverter_max_sell_power
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Max Sell power"
+    id: ${id_prefix}max_sell_power
     address: 245
     unit_of_measurement: "W"
     min_value: 0
@@ -1582,9 +1582,9 @@ number:
 
 text_sensor:
   - platform: modbus_controller            # 059 Overall State
-    modbus_controller_id: inverter
-    name: "Overall State"
-    id: inverter_esphome_overall_state
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Overall State"
+    id: ${id_prefix}esphome_overall_state
     register_type: holding
     skip_updates: ${settings_skipped_updates}
     raw_encode: HEXBYTES
@@ -1601,8 +1601,8 @@ text_sensor:
       }
 
   - platform: template                     # Prog Time 1 Friendly Name
-    name: "Time Slot 1"
-    id: inverter_esphome_time_slot_1
+    name: "${name_prefix}Time Slot 1"
+    id: ${id_prefix}esphome_time_slot_1
     icon: "mdi:clock"
     lambda: |-
         int minutes, hours;
@@ -1618,8 +1618,8 @@ text_sensor:
         return esphome::optional<std::string>(formatted_time);
 
   - platform: template                     # Prog Time 2 Friendly Name
-    name: "Time Slot 2"
-    id: inverter_esphome_time_slot_2
+    name: "${name_prefix}Time Slot 2"
+    id: ${id_prefix}esphome_time_slot_2
     icon: "mdi:clock"
     lambda: |-
         int minutes, hours;
@@ -1635,8 +1635,8 @@ text_sensor:
         return esphome::optional<std::string>(formatted_time);
 
   - platform: template                     # Prog Time 3 Friendly Name
-    name: "Time Slot 3"
-    id: inverter_esphome_time_slot_3
+    name: "${name_prefix}Time Slot 3"
+    id: ${id_prefix}esphome_time_slot_3
     icon: "mdi:clock"
     lambda: |-
         int minutes, hours;
@@ -1652,8 +1652,8 @@ text_sensor:
         return esphome::optional<std::string>(formatted_time);
 
   - platform: template                     # Prog Time 4 Friendly Name
-    name: "Time Slot 4"
-    id: inverter_esphome_time_slot_4
+    name: "${name_prefix}Time Slot 4"
+    id: ${id_prefix}esphome_time_slot_4
     icon: "mdi:clock"
     lambda: |-
         int minutes, hours;
@@ -1669,8 +1669,8 @@ text_sensor:
         return esphome::optional<std::string>(formatted_time);
 
   - platform: template                     # Prog Time 5 Friendly Name
-    name: "Time Slot 5"
-    id: inverter_esphome_time_slot_5
+    name: "${name_prefix}Time Slot 5"
+    id: ${id_prefix}esphome_time_slot_5
     icon: "mdi:clock"
     lambda: |-
         int minutes, hours;
@@ -1686,8 +1686,8 @@ text_sensor:
         return esphome::optional<std::string>(formatted_time);
 
   - platform: template                     # Prog Time 6 Friendly Name
-    name: "Time Slot 6"
-    id: inverter_esphome_time_slot_6
+    name: "${name_prefix}Time Slot 6"
+    id: ${id_prefix}esphome_time_slot_6
     icon: "mdi:clock"
     lambda: |-
         int minutes, hours;
@@ -1703,8 +1703,8 @@ text_sensor:
         return esphome::optional<std::string>(formatted_time);
 
   - platform: modbus_controller            # 003-007 Inverter HEX Serial Number
-    modbus_controller_id: inverter
-    id: inverter_esphome_serial
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_serial
     register_type: holding
     skip_updates: ${settings_skipped_updates}
     raw_encode: HEXBYTES
@@ -1714,8 +1714,8 @@ text_sensor:
 
 
   - platform: template                     # Inverter ASCII Serial Number
-    name: "Serial"
-    id: inverter_esphome_ascii_serial
+    name: "${name_prefix}Serial"
+    id: ${id_prefix}esphome_ascii_serial
     icon: "mdi:text"
     lambda: |-
       std::string hexData = id(inverter_esphome_serial).state;
@@ -1735,9 +1735,9 @@ text_sensor:
 select:
   - platform: modbus_controller            #243 Select Energy Patern
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_select_energy_pattern
-    name: "Energy Pattern"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_select_energy_pattern
+    name: "${name_prefix}Energy Pattern"
     address: 243
     value_type: U_WORD
     optionsmap:
@@ -1746,9 +1746,9 @@ select:
          
   - platform: modbus_controller            #244 Select Work Mode
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_select_work_mode
-    name: "Work Mode"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_select_work_mode
+    name: "${name_prefix}Work Mode"
     address: 244
     value_type: U_WORD
     optionsmap:
@@ -1758,9 +1758,9 @@ select:
 
   - platform: modbus_controller            #235 Select Generator Input
     use_write_multiple: true
-    modbus_controller_id: inverter
-    id: inverter_esphome_select_generator_input
-    name: "Generator Input"
+    modbus_controller_id: ${modbus_controller_id}
+    id: ${id_prefix}esphome_select_generator_input
+    name: "${name_prefix}Generator Input"
     address: 235
     value_type: U_WORD
     optionsmap:
@@ -1770,9 +1770,9 @@ select:
 
   - platform: modbus_controller            #280 Select Grid Peak Shaving
     use_write_multiple: true
-    modbus_controller_id: inverter
-    name: "Grid Peak Shaving"
-    id: inverter_esphome_select_grid_peak_shaving
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Grid Peak Shaving"
+    id: ${id_prefix}esphome_select_grid_peak_shaving
     address: 280
     value_type: U_WORD
     optionsmap:
@@ -1789,7 +1789,7 @@ select:
       return {};
     write_lambda: |-
       //ESP_LOGE("main","Modbus write gets = %d",value);
-      uint16_t unmodified =  id(grid_peak_shaving_raw).state;
+      uint16_t unmodified =  id(${id_prefix}grid_peak_shaving_raw).state;
       //ESP_LOGE("main","Modbus write unmodified = %d", unmodified);
       // optionsmap should only return 2 values... 0 , 256 so bitmask with complement 0x0100 to ensure we keep the original values in register. Then appply OR with the value that was chosen
       uint16_t modified = ((unmodified & ~0x0100) | value);
@@ -1798,9 +1798,9 @@ select:
 
   - platform: modbus_controller            #274 Select Prog1 Charge Option
     use_write_multiple: true
-    modbus_controller_id: inverter
-    name: "Prog1 Charge Option"
-    id: inverter_esphome_select_system_mode_charge_option_time_1
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Prog1 Charge Option"
+    id: ${id_prefix}esphome_select_system_mode_charge_option_time_1
     address: 274
     value_type: U_WORD
     optionsmap:
@@ -1819,15 +1819,15 @@ select:
         return  std::string("Allow Grid & Gen");
       return {};
     write_lambda: |-
-      uint16_t unmodified =  id(reg_274_raw).state;
+      uint16_t unmodified =  id(${id_prefix}reg_274_raw).state;
       uint16_t modified = ((unmodified & ~0x0003) | value);
       return modified;
 
   - platform: modbus_controller            #275  Select Prog2 Charge Option
     use_write_multiple: true
-    modbus_controller_id: inverter
-    name: "Prog2 Charge Option"
-    id: inverter_esphome_select_system_mode_charge_option_time_2
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Prog2 Charge Option"
+    id: ${id_prefix}esphome_select_system_mode_charge_option_time_2
     address: 275
     value_type: U_WORD
     optionsmap:
@@ -1846,15 +1846,15 @@ select:
         return  std::string("Allow Grid & Gen");
       return {};
     write_lambda: |-
-      uint16_t unmodified =  id(reg_275_raw).state;
+      uint16_t unmodified =  id(${id_prefix}reg_275_raw).state;
       uint16_t modified = ((unmodified & ~0x0003) | value);
       return modified;
 
   - platform: modbus_controller            #276  Select Prog3 Charge Option
     use_write_multiple: true
-    modbus_controller_id: inverter
-    name: "Prog3 Charge Option"
-    id: inverter_esphome_select_system_mode_charge_option_time_3
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Prog3 Charge Option"
+    id: ${id_prefix}esphome_select_system_mode_charge_option_time_3
     address: 276
     value_type: U_WORD
     optionsmap:
@@ -1873,15 +1873,15 @@ select:
         return  std::string("Allow Grid & Gen");
       return {};
     write_lambda: |-
-      uint16_t unmodified =  id(reg_276_raw).state;
+      uint16_t unmodified =  id(${id_prefix}reg_276_raw).state;
       uint16_t modified = ((unmodified & ~0x0003) | value);
       return modified;
 
   - platform: modbus_controller            #277  Select Prog4 Charge Option
     use_write_multiple: true
-    modbus_controller_id: inverter
-    name: "Prog4 Charge Option"
-    id: inverter_esphome_select_system_mode_charge_option_time_4
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Prog4 Charge Option"
+    id: ${id_prefix}esphome_select_system_mode_charge_option_time_4
     address: 277
     value_type: U_WORD
     optionsmap:
@@ -1900,15 +1900,15 @@ select:
         return  std::string("Allow Grid & Gen");
       return {};
     write_lambda: |-
-      uint16_t unmodified =  id(reg_277_raw).state;
+      uint16_t unmodified =  id(${id_prefix}reg_277_raw).state;
       uint16_t modified = ((unmodified & ~0x0003) | value);
       return modified;
 
   - platform: modbus_controller            #278  Select Prog5 Charge Option
     use_write_multiple: true
-    modbus_controller_id: inverter
-    name: "Prog5 Charge Option"
-    id: inverter_esphome_select_system_mode_charge_option_time_5
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Prog5 Charge Option"
+    id: ${id_prefix}esphome_select_system_mode_charge_option_time_5
     address: 278
     value_type: U_WORD
     optionsmap:
@@ -1927,15 +1927,15 @@ select:
         return  std::string("Allow Grid & Gen");
       return {};
     write_lambda: |-
-      uint16_t unmodified =  id(reg_278_raw).state;
+      uint16_t unmodified =  id(${id_prefix}reg_278_raw).state;
       uint16_t modified = ((unmodified & ~0x0003) | value);
       return modified;
 
   - platform: modbus_controller            #279  Select Prog6 Charge Option
     use_write_multiple: true
-    modbus_controller_id: inverter
-    name: "Prog6 Charge Option"
-    id: inverter_esphome_select_system_mode_charge_option_time_6
+    modbus_controller_id: ${modbus_controller_id}
+    name: "${name_prefix}Prog6 Charge Option"
+    id: ${id_prefix}esphome_select_system_mode_charge_option_time_6
     address: 279
     value_type: U_WORD
     optionsmap:
@@ -1954,16 +1954,16 @@ select:
         return  std::string("Allow Grid & Gen");
       return {};
     write_lambda: |-
-      uint16_t unmodified =  id(reg_279_raw).state;
+      uint16_t unmodified =  id(${id_prefix}reg_279_raw).state;
       uint16_t modified = ((unmodified & ~0x0003) | value);
       return modified;
 
 #Disabled as these are for Turbo Energy Inverters
   # - platform: modbus_controller            #274  Select Prog1 Mode Option
   #   use_write_multiple: true
-  #   modbus_controller_id: inverter
-  #   name: "Prog1 Mode Option"
-  #   id: inverter_esphome_select_system_mode_program_option_time_1
+  #   modbus_controller_id: ${modbus_controller_id}
+  #   name: "${name_prefix}Prog1 Mode Option"
+  #   id: ${id_prefix}esphome_select_system_mode_program_option_time_1
   #   address: 274
   #   value_type: U_WORD
   #   optionsmap:
@@ -1982,15 +1982,15 @@ select:
   #       return  std::string("Charge");
   #     return {};
   #   write_lambda: |-
-  #     uint16_t unmodified =  id(reg_274_raw).state;
+  #     uint16_t unmodified =  id(${id_prefix}reg_274_raw).state;
   #     uint16_t modified = ((unmodified & ~0x1C) | value);
   #     return modified;
 
   # - platform: modbus_controller            #275  Select Prog2 Mode Option
   #   use_write_multiple: true
-  #   modbus_controller_id: inverter
-  #   name: "Prog2 Mode Option"
-  #   id: inverter_esphome_select_system_mode_program_option_time_2
+  #   modbus_controller_id: ${modbus_controller_id}
+  #   name: "${name_prefix}Prog2 Mode Option"
+  #   id: ${id_prefix}esphome_select_system_mode_program_option_time_2
   #   address: 275
   #   value_type: U_WORD
   #   optionsmap:
@@ -2009,15 +2009,15 @@ select:
   #       return  std::string("Charge");
   #     return {};
   #   write_lambda: |-
-  #     uint16_t unmodified =  id(reg_275_raw).state;
+  #     uint16_t unmodified =  id(${id_prefix}reg_275_raw).state;
   #     uint16_t modified = ((unmodified & ~0x1C) | value);
   #     return modified;
 
   # - platform: modbus_controller            #276  Select Prog3 Mode Option
   #   use_write_multiple: true
-  #   modbus_controller_id: inverter
-  #   name: "Prog3 Mode Option"
-  #   id: inverter_esphome_select_system_mode_program_option_time_3
+  #   modbus_controller_id: ${modbus_controller_id}
+  #   name: "${name_prefix}Prog3 Mode Option"
+  #   id: ${id_prefix}esphome_select_system_mode_program_option_time_3
   #   address: 276
   #   value_type: U_WORD
   #   optionsmap:
@@ -2036,15 +2036,15 @@ select:
   #       return  std::string("Charge");
   #     return {};
   #   write_lambda: |-
-  #     uint16_t unmodified =  id(reg_276_raw).state;
+  #     uint16_t unmodified =  id(${id_prefix}reg_276_raw).state;
   #     uint16_t modified = ((unmodified & ~0x1C) | value);
   #     return modified;
 
   # - platform: modbus_controller            #277  Select Prog4 Mode Option
   #   use_write_multiple: true
-  #   modbus_controller_id: inverter
-  #   name: "Prog4 Mode Option"
-  #   id: inverter_esphome_select_system_mode_program_option_time_4
+  #   modbus_controller_id: ${modbus_controller_id}
+  #   name: "${name_prefix}Prog4 Mode Option"
+  #   id: ${id_prefix}esphome_select_system_mode_program_option_time_4
   #   address: 277
   #   value_type: U_WORD
   #   optionsmap:
@@ -2063,15 +2063,15 @@ select:
   #       return  std::string("Charge");
   #     return {};
   #   write_lambda: |-
-  #     uint16_t unmodified =  id(reg_277_raw).state;
+  #     uint16_t unmodified =  id(${id_prefix}reg_277_raw).state;
   #     uint16_t modified = ((unmodified & ~0x1C) | value);
   #     return modified;
 
   # - platform: modbus_controller            #278  Select Prog5 Mode Option
   #   use_write_multiple: true
-  #   modbus_controller_id: inverter
-  #   name: "Prog5 Mode Option"
-  #   id: inverter_esphome_select_system_mode_program_option_time_5
+  #   modbus_controller_id: ${modbus_controller_id}
+  #   name: "${name_prefix}Prog5 Mode Option"
+  #   id: ${id_prefix}esphome_select_system_mode_program_option_time_5
   #   address: 278
   #   value_type: U_WORD
   #   optionsmap:
@@ -2090,15 +2090,15 @@ select:
   #       return  std::string("Charge");
   #     return {};
   #   write_lambda: |-
-  #     uint16_t unmodified =  id(reg_278_raw).state;
+  #     uint16_t unmodified =  id(${id_prefix}reg_278_raw).state;
   #     uint16_t modified = ((unmodified & ~0x1C) | value);
   #     return modified;
 
   # - platform: modbus_controller            #279  Select Prog6 Mode Option
   #   use_write_multiple: true
-  #   modbus_controller_id: inverter
-  #   name: "Prog6 Mode Option"
-  #   id: inverter_esphome_select_system_mode_program_option_time_6
+  #   modbus_controller_id: ${modbus_controller_id}
+  #   name: "${name_prefix}Prog6 Mode Option"
+  #   id: ${id_prefix}esphome_select_system_mode_program_option_time_6
   #   address: 279
   #   value_type: U_WORD
   #   optionsmap:
@@ -2117,6 +2117,6 @@ select:
   #       return  std::string("Charge");
   #     return {};
   #   write_lambda: |-
-  #     uint16_t unmodified =  id(reg_279_raw).state;
+  #     uint16_t unmodified =  id(${id_prefix}reg_279_raw).state;
   #     uint16_t modified = ((unmodified & ~0x1C) | value);
   #     return modified;

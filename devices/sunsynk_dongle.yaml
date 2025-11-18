@@ -1,0 +1,27 @@
+esp32:
+  board: airm2m_core_esp32c3
+  framework:
+    type: esp-idf
+  variant: esp32c3
+
+logger:
+  baud_rate: 0
+
+uart:
+  - id: logger_
+    tx_pin: GPIO21
+    rx_pin: GPIO20
+    baud_rate: 115200
+  - id: mod_bus
+    tx_pin: GPIO5
+    rx_pin: GPIO6
+    baud_rate: 9600
+ 
+output:
+  - platform: gpio
+    pin: GPIO3
+    id: red_led
+
+  - platform: gpio
+    pin: GPIO7
+    id: green_led

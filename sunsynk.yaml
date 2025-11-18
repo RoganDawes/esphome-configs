@@ -2,17 +2,18 @@ esphome:
   name: sunsynk
   comment: 'SunSynk'
   
-esp32:
-  board: airm2m_core_esp32c3
-  framework:
-    type: esp-idf
-  variant: esp32c3
-
 packages:
+  device: !include devices/sunsynk_dongle.yaml
   common: !include include/common.yaml
-  modbus: !include include/sunsynk_modbus.yaml
+  modbus: !include
+    file: include/sunsynk_modbus.yaml
+    vars:
+      modbus_controller_id: inverter
+      id_prefix: inverter_
+      # If you set a name prefix, also include a trailing space character
+      name_prefix: "Inverter "
 
-# Disable logging
+# Disable UART logging
 logger:
   baud_rate: 0
 
@@ -20,16 +21,10 @@ bluetooth_proxy:
   active: true
 
 esp32_ble_tracker:
-  max_connections: 3
 
-uart:
-  - id: mod_bus
-    tx_pin: GPIO5
-    rx_pin: GPIO6
-    baud_rate: 9600
- 
 modbus:
   id: inverter_modbus
+  uart_id: mod_bus
  
 modbus_controller:
   - id: inverter
