@@ -1,0 +1,132 @@
+packages:
+  device: !include motor_supervisor_v1.yaml
+
+select:
+  - platform: template
+    id: cover_state
+    options:
+      - CLOSING_STOPPED
+      - OPENING
+      - OPENING_STOPPED
+      - CLOSING
+    optimistic: true
+ 
+binary_sensor:
+    # when the door starts moving, one motor sensor goes straight to ON
+    # while the other uses PWM. The "delayed_on" filter turns one
+    # _movement sensor below on within 100ms, while the other stays off
+  - id: !extend motor_a
+    filters:
+      - delayed_on: 100ms
+
+  - id: !extend motor_b
+    filters:
+      - delayed_on: 100ms
+
+  - platform: template
+    id: open_movement
+    lambda: |-
+      return (id(motor_b).state && !id(close_movement).state);
+
+  - platform: template
+    id: close_movement
+    lambda: |-
+      return (id(motor_a).state && !id(open_movement).state);
+
+  # The endstop sensors are updated from the duty_cycle sensors below
+  - platform: template
+    id: open_endstop
+
+  - platform: template
+    id: close_endstop
+
+sensor:
+  # By observation of the duty_cycle values for motor_a and motor_b, it can be observed that
+  # both values spike from 0 to 100% when the motor starts moving in either direction, but then
+  # one value drops to around 45-55% after about 1.2s. If the cover is stopped externally, the
+  # PWM values drop immediately to zero. However, if the controller detects that it is approaching
+  # its limits, the duty cycle then rises to either 100% (opening endstop) or around 95% (closing endstop).
+  # This allows us to detect when the controller believes the cover is completely open or closed.
+  # The filters were added after the fact to reduce log verbosity and simplify comparisons.
+
+  - id: !extend motor_a_duty_cycle
+    filters:
+      - round_to_multiple_of: 10
+      - delta: 10
+    on_value:
+      then:
+        - lambda: |-
+            if (id(motor_b_duty_cycle).state == 100 && x > 20 && x < 80
+              && strcmp(id(cover_state).current_option(), "OPENING") != 0) {
+                auto call = id(cover_state).make_call();
+                call.set_option("OPENING");
+                call.perform();
+                id(close_endstop).publish_state(false);
+            } else if (strcmp(id(cover_state).current_option(), "OPENING") == 0 && x >= 80) {
+              id(open_endstop).publish_state(true); // deceleration to endstop
+            } else if (x == 0 && strcmp(id(cover_state).current_option(), "OPENING") == 0) {
+              auto call = id(cover_state).make_call();
+              call.set_option("OPENING_STOPPED");
+              call.perform();
+            }
+
+  - id: !extend motor_b_duty_cycle
+    filters:
+      - round_to_multiple_of: 10
+      - delta: 10
+    on_value:
+      then:
+        - lambda: |-
+            if (id(motor_a_duty_cycle).state == 100 && x > 20 && x < 80
+              && strcmp(id(cover_state).current_option(), "CLOSING") != 0) {
+                auto call = id(cover_state).make_call();
+                call.set_option("CLOSING");
+                call.perform();
+                id(open_endstop).publish_state(false);
+            } else if (strcmp(id(cover_state).current_option(), "CLOSING") == 0 && x >= 80) {
+              id(close_endstop).publish_state(true); // deceleration to endstop
+            } else if (x == 0 && strcmp(id(cover_state).current_option(), "CLOSING") == 0) {
+              auto call = id(cover_state).make_call();
+              call.set_option("CLOSING_STOPPED");
+              call.perform();
+            }
+
+button:
+  - platform: output
+    output: out_1
+    id: trg
+    duration: 200ms
+
+# The cover exposed to Home Assistant, representing the door's motion
+# Note that the open_action, close_action, stop_action are not guaranteed
+# to perform the expected action, it all depends on what the cover was
+# doing previously. I tried a scripted approach to this, but it failed
+# miserably. Feels like it needs to be integrated into the cover somehow
+# since there is already a "cover.toggle()" method, it clearly knows its
+# own state, even if it is not exposed. Exposing it is probably the first
+# step, and will remove need for the "cover_state" select!
+cover:
+  - platform: feedback
+    id: cover_
+    name: None
+    device_class: garage
+    has_built_in_endstop: true
+    infer_endstop_from_movement: false
+    direction_change_wait_time: 2s
+    acceleration_wait_time: 2s
+
+    open_action:
+      - button.press: trg
+    open_duration: 14s
+    open_sensor: open_movement
+    open_endstop: open_endstop
+
+    close_action:
+      - button.press: trg
+    close_duration: 16s
+    close_sensor: close_movement
+    close_endstop: close_endstop
+
+    stop_action:
+      - button.press: trg
+
