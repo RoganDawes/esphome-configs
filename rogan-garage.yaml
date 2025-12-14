@@ -2,58 +2,7 @@ esphome:
   name: rogan-garage
   friendly_name: "Rogan's Garage"
 
-logger:
-#  level: verbose
-
 packages:
-  device: !include devices/motor_supervisor_v1.yaml
+  device: !include devices/dforce-1500gd.yaml
   common: !include include/common.yaml
 
-binary_sensor:
-  - id: !extend motor_a
-    filters:
-      - delayed_on: 100ms
-
-  - id: !extend motor_b
-    filters:
-      - delayed_on: 100ms
-
-  - platform: template
-    id: open_movement
-    lambda: |-
-      return (id(motor_b).state && !id(close_movement).state);
-
-  - platform: template
-    id: close_movement
-    lambda: |-
-      return (id(motor_a).state && !id(open_movement).state);
-
-button:
-  - platform: output
-    output: out_1
-    id: trg
-    duration: 200ms
-
-# The cover exposed to Home Assistant, representing the door's motion
-cover:
-  - platform: feedback
-    id: cover_
-    name: None
-    device_class: garage
-    has_built_in_endstop: true
-    infer_endstop_from_movement: true
-    direction_change_wait_time: 2s
-    acceleration_wait_time: 1s
-
-    open_action:
-      - button.press: trg
-    open_duration: 12s
-    open_sensor: open_movement
-
-    close_action:
-      - button.press: trg
-    close_duration: 12s
-    close_sensor: close_movement
-
-    stop_action:
-      - button.press: trg
