@@ -45,6 +45,7 @@ binary_sensor:
       mode:
         input: true
         pullup: true
+      allow_other_uses: true
   - platform: gpio
     id: motor_b
     pin:
@@ -53,6 +54,30 @@ binary_sensor:
       mode:
         input: true
         pullup: true
+      allow_other_uses: true
+
+sensor:
+  - platform: duty_cycle
+    id: motor_a_duty_cycle
+    pin:
+      number: GPIO33
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+      allow_other_uses: true
+    update_interval: 100ms
+
+  - platform: duty_cycle
+    id: motor_b_duty_cycle
+    pin:
+      number: GPIO32
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+      allow_other_uses: true
+    update_interval: 100ms
 
 output:
   - platform: gpio
