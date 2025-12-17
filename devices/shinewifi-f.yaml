@@ -1,0 +1,93 @@
+esp8266:
+  board: esp07s
+
+# Disable logging
+logger:
+  # the below lines move logging to the alternate UART pins
+  # this exposes the TX line on the GD25Q SPI flash CS pin #1
+  # which can be snooped with a chip clip or pin grabbers. GND is pin #4
+  # If you want to keep the hardware UART for the modbus uart,
+  # uncomment the baud_rate, and comment the hardware_uart
+  baud_rate: 0
+#  hardware_uart: UART0_SWAP
+
+# Disabled by default, because of limited RAM
+# required for the pcf8563
+i2c:
+  scl: GPIO4
+  sda: GPIO5
+
+time:
+  - platform: sntp
+    id: sntp_time
+    on_time_sync:
+      then:
+        pcf8563.write_time:
+
+  - platform: pcf8563
+    id: pcf8563_time
+    address: 0x51
+
+# SPI bus is connected to the GD25Qxxxx SPI NOR Flash chip
+# Mine was covered with conformal coating, so I couldn't make out the
+# exact part number
+# e.g. https://eu.mouser.com/datasheet/2/870/gd25q64e_rev1_4_20210820-1825464.pdf
+#spi:
+#  clk_pin: GPIO14
+#  mosi_pin: GPIO13
+#  miso_pin: GPIO12
+
+# There's no support for flash chips in ESPHome at the moment
+# But the CS pin is GPIO15
+
+light:
+  - platform: status_led
+    id: status_led_
+    output: led_red
+    internal: true
+
+output:
+    # Green LED
+  - id: led_green
+    platform: gpio
+    pin: GPIO0
+
+    # Red LED
+  - id: led_red
+    platform: gpio
+    pin: GPIO2
+
+    # Blue LED
+  - id: led_blue
+    platform: gpio
+    pin: GPIO16
+
+uart:
+  - id: modbus_uart_master
+    baud_rate: 9600
+    rx_pin: GPIO3
+    tx_pin: GPIO1
+
+button:
+  - platform: safe_mode
+    id: safe_mode_
+    name: "Safe mode"
+
+binary_sensor:
+  - platform: analog_threshold
+    name: Button
+    sensor_id: adc_button
+    threshold: 0.5
+    filters:
+      invert:
+    on_press:
+      then:
+        button.press: safe_mode_
+
+sensor:
+  - platform: adc
+    pin: GPIO17
+    id: adc_button
+    update_interval: 1s
+    filters:
+      delta: 0.1

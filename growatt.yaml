@@ -1,0 +1,43 @@
+esphome:
+  name: growatt
+  friendly_name: Growatt
+
+packages:
+  - !include devices/shinewifi-f.yaml
+  - !include include/common.yaml
+  - !include
+    file: include/growatt_modbus.yaml
+    vars:
+      modbus_device: 1
+      modbus_controller_id: growatt_master
+      inverter: Master
+
+time:
+  - platform: sntp
+    id: sntp_time
+    on_time_sync:
+      then:
+        pcf8563.write_time:
+
+button:
+  - platform: safe_mode
+    id: safe_mode_
+    name: "Safe mode"
+
+binary_sensor:
+  - id: !extend button_
+    on_press:
+      then:
+        button.press: safe_mode_
+
+modbus:
+  - id: modbus_master
+    uart_id: modbus_uart_master
+
+modbus_controller:
+  - id: growatt_master
+    address: 0x1
+    modbus_id: modbus_master
+    setup_priority: -10 
+
+
