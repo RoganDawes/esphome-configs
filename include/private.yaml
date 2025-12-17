@@ -1,0 +1,22 @@
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  password: !secret ota_password
+
+udp:
+  - addresses: !secret syslog_server
+    id: syslog_server
+
+syslog:
+  udp_id: syslog_server
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  domain: !secret wifi_domain
+  fast_connect: true
+  ap:
+    password: !secret wifi_ap_password
