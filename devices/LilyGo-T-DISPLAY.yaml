@@ -1,0 +1,40 @@
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+spi:
+  - id: display_spi
+    clk_pin: GPIO18
+    mosi_pin: GPIO19
+
+display:
+  - platform: mipi_spi
+    id: display_
+    model: T-DISPLAY
+    spi_id: display_spi
+    show_test_card: true
+
+output:
+  - platform: ledc
+    id: backlight_output
+    pin: GPIO4
+
+light:
+  - platform: monochromatic
+    id: backlight
+    output: backlight_output
+    restore_mode: ALWAYS_ON
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO35
+      inverted: true
+    id: tdisplay_right_button
+
+  - platform: gpio
+    pin:
+      number: GPIO0
+      inverted: true
+    id: tdisplay_left_button
