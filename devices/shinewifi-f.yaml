@@ -18,12 +18,6 @@ i2c:
   sda: GPIO5
 
 time:
-  - platform: sntp
-    id: sntp_time
-    on_time_sync:
-      then:
-        pcf8563.write_time:
-
   - platform: pcf8563
     id: pcf8563_time
     address: 0x51
@@ -68,21 +62,13 @@ uart:
     rx_pin: GPIO3
     tx_pin: GPIO1
 
-button:
-  - platform: safe_mode
-    id: safe_mode_
-    name: "Safe mode"
-
 binary_sensor:
   - platform: analog_threshold
-    name: Button
+    id: button_
     sensor_id: adc_button
     threshold: 0.5
     filters:
       invert:
-    on_press:
-      then:
-        button.press: safe_mode_
 
 sensor:
   - platform: adc
