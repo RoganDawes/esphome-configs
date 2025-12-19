@@ -47,7 +47,6 @@ remote_receiver:
           if (id(keeloq_crypter).decrypt(x)) {
             snprintf(buff, sizeof(buff), "%07x:%1x:%08X:%c:%c", 
                      x.address, x.command, x.encrypted, x.vlow ? 'L' : 'N', x.repeat ? 'R' : 'F');
-            std::string buffAsStdStr = buff;
             id(keeloq_remote).publish_state(buff);
           } else {
             ESP_LOGW("main", "Invalid Keeloq received: Address %04x, Command %1x, Encrypted %07x", x.address, x.command, x.encrypted);
