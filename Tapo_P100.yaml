@@ -1,0 +1,29 @@
+esphome:
+  name: tapo_p100
+  friendly_name: Tapo P100
+
+packages:
+  - !include devices/Tapo_P100EU.yaml
+  - !include include/common.yaml
+
+web_server: !remove
+captive_portal: !remove
+
+switch:
+  - id: !extend relay
+    name: Relay
+    on_turn_on:
+      then:
+        - light.turn_on: green_led
+    on_turn_off:
+      then:
+        - light.turn_off: green_led
+
+light:
+  - id: !remove orange_led
+
+binary_sensor:
+  - id: !extend button_
+    on_press:
+      then:
+        - switch.toggle: relay 

@@ -1,0 +1,49 @@
+rtl87xx:
+  board: generic-rtl8720cf-2mb-992k
+  framework:
+    version: 0.0.0
+    source: https://github.com/prokoma/libretiny#ambz2-fix
+#    loglevel: VERBOSE
+
+output:
+  - platform: gpio
+    id: relay_output
+    pin: PA8
+
+# NB: The LED is an orange/green bi-colour LED, which
+# lights up depending on which terminal is positive w.r.t
+# the other. if PA9 is high, and PA10 is low, the orange LED
+# illuminates, while if PA10 is high and PA9 is low, the 
+# green LED illuminates
+#
+# Ideally there would be a lambda on the output that turns
+# the other off if one goes high, but this is not possible.
+
+  - platform: gpio
+    id: output_orange_led
+    pin: PA9
+
+  - platform: gpio
+    id: output_green_led
+    pin: PA10
+
+switch:
+  - platform: output
+    id: relay
+    output: relay_output
+
+light:
+  - platform: binary
+    id: orange_led
+    output: output_orange_led
+
+  - platform: binary
+    id: green_led
+    output: output_green_led
+
+binary_sensor:
+  - platform: gpio
+    id: button_
+    pin:
+      number: PA17 
+      inverted: true
