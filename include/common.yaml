@@ -7,6 +7,7 @@
 
 substitutions:
   private_overrides: !include private.yaml
+  public_overrides: !include public.yaml
   public: false
   logger_level: INFO
 
@@ -21,7 +22,8 @@ ota:
   platform: esphome
 
 time:
-  platform: sntp
+  - platform: sntp
+    id: sntp_
 
 wifi:
   ap:
@@ -70,4 +72,4 @@ button:
     entity_category: config
 
 packages:
-  - ${ {} if public else private_overrides }
+  - ${ public_overrides if public else private_overrides }
