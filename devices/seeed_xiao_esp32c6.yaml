@@ -1,0 +1,27 @@
+esp32:
+  board: seeed_xiao_esp32c6
+  variant: esp32c6
+
+output:
+  - platform: gpio
+    pin:
+      number: GPIO15
+      inverted: true
+      ignore_strapping_warning: true
+    id: output_user_led
+
+  - platform: gpio
+    pin: GPIO14
+    id: output_rf_switch
+
+  - platform: gpio
+    pin:
+      number: GPIO3
+      inverted: true
+    id: output_enable_rf_switch
+
+light:
+  - platform: status_led
+    id: user_led
+    output: output_user_led
+    name: "User LED"

@@ -1,0 +1,51 @@
+substitutions:
+  public: true
+
+esphome:
+  name: nova
+  friendly_name: Nova
+
+packages:
+  - !include devices/seeed_xiao_esp32c6.yaml
+  - !include include/common.yaml
+
+logger:
+
+output:
+  - platform: gpio
+    pin: GPIO1
+    id: output_1
+  - platform: gpio
+    pin: GPIO2
+    id: output_2
+  - platform: gpio
+    pin: GPIO21
+    id: output_3
+  - platform: gpio
+    pin: GPIO22
+    id: output_4
+
+button:
+  - platform: output
+    id: button_1
+    name: "Button 1"
+    output: output_1
+    duration: 500ms
+
+  - platform: output
+    id: button_2
+    name: "Button 2"
+    output: output_2
+    duration: 500ms
+
+  - platform: output
+    id: button_3
+    name: "Button 3"
+    output: output_3
+    duration: 500ms
+
+  - platform: output
+    id: button_4
+    name: "Button 4"
+    output: output_4
+    duration: 500ms
