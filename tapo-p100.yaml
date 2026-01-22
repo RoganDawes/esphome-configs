@@ -1,5 +1,5 @@
 esphome:
-  name: tapo_p100
+  name: tapo-p100
   friendly_name: Tapo P100
 
 packages:
