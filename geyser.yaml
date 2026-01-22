@@ -10,6 +10,8 @@ esphome:
       then:
       # make sure the geyser is in a known state at startup
       - switch.turn_off: main_relay
+      # Make sure that the 1-wire bus is powered
+      - output.turn_on: sensor_power_output
       # Default to running the geyser in Home mode
       - script.execute: geyser_on
 
@@ -45,7 +47,7 @@ switch:
 binary_sensor:
   # For someone in the ceiling, this can be used to turn the climate control
   # into OFF or HEAT modes. It does NOT directly control the relay.
-  - id: !extend button0
+  - id: !extend button_
     on_press:
       then:
         - if:

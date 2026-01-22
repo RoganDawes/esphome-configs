@@ -4,56 +4,34 @@ esp32:
     type: esp-idf
 
 binary_sensor:
-  # single main button that also puts device into flash mode when held on boot
+  # single button that also puts device into flash mode when held on boot
   - platform: gpio
     pin:
       number: GPIO0
       mode: INPUT_PULLUP
       inverted: True
       ignore_strapping_warning: true
-    id: button0
+    id: button_
     filters:
       - delayed_on_off: 50ms
 
 switch:
-  # template switch to represent the main relay
-  # this is synchronised with the RED LED
-  - platform: template
+  - platform: hbridge
     id: main_relay
-    name: Relay
-    turn_on_action:
-      - button.press: main_relay_on
-      - light.turn_on: red_led
-    turn_off_action:
-      - button.press: main_relay_off
-      - light.turn_off: red_led
-    assumed_state: True
-    optimistic: True
-    restore_mode: ALWAYS_OFF
-
-  - platform: output
-    name: Sensor Power
-    id: sensor_power
-    output: sensor_power_output
-    restore_mode: ALWAYS_ON
-
-output:
-  # Ideally, these two relay GPIOs should be interlocked to prevent
-  # simultaneous operation. ESPhome currently does not support
-  # interlocks at an output: level, or even at a button: level
-  # BE CAREFUL!
-  - platform: gpio 
-    id: main_relay_on_output
-    pin:
+    on_pin:
       number: GPIO19
       inverted: true
-
-  - platform: gpio 
-    id: main_relay_off_output
-    pin:
+    off_pin:
       number: GPIO22
       inverted: true
+    pulse_length: 100ms
+    wait_time: 100ms
 
+  - platform: output
+    id: sensor_power
+    output: sensor_power_output
+
+output:
   - platform: ledc 
     id: red_led_output
     pin:
@@ -73,19 +51,6 @@ output:
     id: sensor_power_output
     
 button:
-  # See note above about interlocks!
-  - platform: output
-    id: main_relay_on
-    output: main_relay_on_output
-    duration: 1000ms
-    internal: true
-
-  - platform: output
-    id: main_relay_off
-    output: main_relay_off_output
-    duration: 1000ms
-    internal: true
-
 # The middle (blue) LED is used as wifi status indicator.
 status_led:
   pin:
