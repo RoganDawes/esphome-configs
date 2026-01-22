@@ -11,7 +11,7 @@ esphome:
       # make sure the geyser is in a known state at startup
       - switch.turn_off: main_relay
       # Make sure that the 1-wire bus is powered
-      - output.turn_on: sensor_power_output
+      - output.turn_on: sensor_power
       # Default to running the geyser in Home mode
       - script.execute: geyser_on
 
@@ -25,9 +25,6 @@ esp32:
 
 preferences:
   flash_write_interval: never
-
-logger:
-  level: DEBUG
 
 bluetooth_proxy:
 
@@ -74,9 +71,9 @@ binary_sensor:
       - delayed_on: 120s
     on_press:
       then:
-        - switch.turn_off: sensor_power
+        - output.turn_off: sensor_power
         - delay: 5s
-        - switch.turn_on: sensor_power
+        - output.turn_on: sensor_power
         - script.execute: delayed_restart
     on_release:
       then:
@@ -98,10 +95,6 @@ sensor:
     update_interval: 10s
     id: temp
     name: "Temperature"
-    filters:
-      - sliding_window_moving_average:
-          window_size: 6
-          send_every: 6
     on_value_range:
       - below: 0.0
         then:

@@ -27,10 +27,6 @@ switch:
     pulse_length: 100ms
     wait_time: 100ms
 
-  - platform: output
-    id: sensor_power
-    output: sensor_power_output
-
 output:
   - platform: ledc 
     id: red_led_output
@@ -48,7 +44,7 @@ output:
   # It receives 3v3 from this pin, which is pulled up on boot.
   - platform: gpio
     pin: GPIO27
-    id: sensor_power_output
+    id: sensor_power
     
 button:
 # The middle (blue) LED is used as wifi status indicator.
