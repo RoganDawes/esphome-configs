@@ -18,5 +18,6 @@ wifi:
   password: !secret wifi_password
   domain: !secret wifi_domain
   fast_connect: true
+  min_auth_mode: WPA2
   ap:
     password: !secret wifi_ap_password
