@@ -19,11 +19,9 @@ switch:
   - platform: hbridge
     id: main_relay
     on_pin:
-      number: GPIO19
-      inverted: true
-    off_pin:
       number: GPIO22
-      inverted: true
+    off_pin:
+      number: GPIO19
     pulse_length: 100ms
     wait_time: 100ms
 
