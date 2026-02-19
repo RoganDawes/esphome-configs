@@ -4,12 +4,9 @@ esphome:
 external_components:
   - source: github://RoganDawes/esphome-components
     components: [weather_xm]
-    refresh: 1s
+    refresh: 1d
   - source: github://pr#11196
     components: [json]
-    refresh: 1h
-  - source: github://pr#11548
-    components: [usb_host, usb_uart]
     refresh: 1h
 
 packages:
