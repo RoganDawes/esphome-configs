@@ -1,0 +1,17 @@
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+uart:
+  - id: uart_485
+    baud_rate: 9600
+    tx_pin: GPIO17
+    rx_pin: GPIO16
+    debug:
+      direction: BOTH
+
+modbus:
+  - id: modbus_485
+    uart_id: uart_485
+    flow_control_pin: GPIO4
