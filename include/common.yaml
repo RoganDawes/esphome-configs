@@ -6,9 +6,9 @@
 # $ esphome -s public true -s logger_level DEBUG run example.yaml
 
 substitutions:
+  public: false
   private_overrides: ${ {} if public else "!include private.yaml" }
   public_overrides: !include public.yaml
-  public: false
   logger_level: INFO
 
 # Enable logging
