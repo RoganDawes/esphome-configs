@@ -7,7 +7,7 @@
 
 substitutions:
   public: false
-  private_overrides: ${ {} if public else "!include private.yaml" }
+  private_overrides: !include private.yaml
   public_overrides: !include public.yaml
   logger_level: INFO
 
