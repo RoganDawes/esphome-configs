@@ -65,3 +65,11 @@ each configuration (to make as many cores available
 to the compiler as possible), while uploading the
 compiled firmware to the device in the background.
 
+Note:
+=====
+
+This repo makes use of git tricks to stop the secrets.yaml
+file from appearing to be modified (with my personal values):
+
+git update-index --assume-unchanged secrets.yaml
+
