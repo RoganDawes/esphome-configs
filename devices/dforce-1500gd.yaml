@@ -57,14 +57,14 @@ sensor:
       then:
         - lambda: |-
             if (id(motor_b_duty_cycle).state == 100 && x > 20 && x < 80
-              && strcmp(id(cover_state).current_option(), "OPENING") != 0) {
+              && id(cover_state).current_option() != "OPENING") {
                 auto call = id(cover_state).make_call();
                 call.set_option("OPENING");
                 call.perform();
                 id(close_endstop).publish_state(false);
-            } else if (strcmp(id(cover_state).current_option(), "OPENING") == 0 && x >= 80) {
+            } else if (id(cover_state).current_option() == "OPENING" && x >= 80) {
               id(open_endstop).publish_state(true); // deceleration to endstop
-            } else if (x == 0 && strcmp(id(cover_state).current_option(), "OPENING") == 0) {
+            } else if (x == 0 && id(cover_state).current_option() == "OPENING") {
               auto call = id(cover_state).make_call();
               call.set_option("OPENING_STOPPED");
               call.perform();
@@ -78,14 +78,14 @@ sensor:
       then:
         - lambda: |-
             if (id(motor_a_duty_cycle).state == 100 && x > 20 && x < 80
-              && strcmp(id(cover_state).current_option(), "CLOSING") != 0) {
+              && id(cover_state).current_option() != "CLOSING") {
                 auto call = id(cover_state).make_call();
                 call.set_option("CLOSING");
                 call.perform();
                 id(open_endstop).publish_state(false);
-            } else if (strcmp(id(cover_state).current_option(), "CLOSING") == 0 && x >= 80) {
+            } else if (id(cover_state).current_option() == "CLOSING" && x >= 80) {
               id(close_endstop).publish_state(true); // deceleration to endstop
-            } else if (x == 0 && strcmp(id(cover_state).current_option(), "CLOSING") == 0) {
+            } else if (x == 0 && id(cover_state).current_option() == "CLOSING") {
               auto call = id(cover_state).make_call();
               call.set_option("CLOSING_STOPPED");
               call.perform();
