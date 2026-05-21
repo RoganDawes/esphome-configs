@@ -1,0 +1,9 @@
+pace_bms:
+  - id: ${pace_bms_id}
+    address: ${pace_bms_address}
+    type: SLAVE
+    master_bms_id: ${master_bms_id}
+
+packages:
+  sensors: !include
+    file: pacebms-sensors.yaml

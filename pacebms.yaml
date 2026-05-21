@@ -1,0 +1,62 @@
+esphome:
+  name: pacebms
+  friendly_name: Pace BMS
+  min_version: 2025.10.0
+  name_add_mac_suffix: false
+
+  devices:
+    - id: bms_master
+      name: "Pace BMS Pack 1"
+    - id: bms_slave_2
+      name: "Pace BMS Pack 2"
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/nkinnan/esphome-pace-bms
+    components: [ pace_bms ]
+    refresh: 1d
+
+host:
+wifi: !remove
+captive_portal: !remove
+web_server: !remove
+time:
+  - id: !extend sntp_
+    platform: host
+
+text_sensor:
+  id: !remove wifi_info_
+
+sensor:
+  id: !remove wifi_signal_
+
+packages:
+  common: !include
+    file: include/common.yaml
+  bms_master: !include
+    file: include/pacebms-master.yaml
+    vars:
+      pace_bms_id: master_pace_bms_at_address_1
+      device_id: bms_master
+  bms_slave_2: !include
+    file: include/pacebms-slave.yaml
+    vars:
+      pace_bms_id: slave_pace_bms_at_address_2
+      pace_bms_address: 2
+      master_bms_id: master_pace_bms_at_address_1
+      device_id: bms_slave_2
+
+uart:
+  id: bms_uart
+  baud_rate: 9600
+  port: "/dev/ttyUSB1"
+  rx_buffer_size: 1024 # 256 * 4 for 4 battery packs
+  debug:
+    direction: BOTH
+    dummy_receiver: false
+
+pace_bms:
+  - id: !extend master_pace_bms_at_address_1
+    uart_id: bms_uart
+ 

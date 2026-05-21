@@ -1,0 +1,89 @@
+pace_bms:
+  - id: ${pace_bms_id}
+    address: 1
+    update_interval: 5s
+    request_throttle: 50ms
+    response_timeout: 8000ms # 2000 * 4, for four battery packs in this system
+
+    protocol_commandset: 0x25   # example only
+    # protocol_variant: "EG4"   # example only
+    # protocol_version: 0x20    # example only
+    # battery_chemistry: 0x4A   # example only
+
+    type: MASTER
+    slave_query_mode: BROADCAST
+    rx_buffer_size: 1024 # 256 * 4, for four battery packs in this system
+
+    # group all sensors for this BMS under a sub-device name
+    # to avoid sensor naming collisions
+    device_id: ${device_id}
+
+packages:
+  sensors: !include
+    file: pacebms-sensors.yaml
+    vars:
+      pace_bms_id: ${pace_bms_id}
+      device_id: ${device_id}
+
+sensor:
+  - platform: pace_bms
+    pace_bms_id: ${pace_bms_id}
+    device_id: ${device_id}
+
+    # (`type=MASTER` and `protocol_commandset=0x25` BMSes only)
+    bms_count:
+      name: "BMS Count"
+    # (`type=MASTER` and `protocol_commandset=0x25` BMSes only)
+    payload_count:
+      name: "Payload Count"
+
+#text_sensor:
+#  - platform: pace_bms
+#    pace_bms_id: ${pace_bms_id}
+#    device_id: ${device_id}
+
+    # (`type=MASTER` BMSes only)
+#    hardware_version:
+#      name: "Hardware Version"
+
+    # (`type=MASTER` BMSes only)
+#    serial_number: # not available on EG4 protocol 0x20 variant
+#      name: "Serial Number"
+
+#datetime:
+#  - platform: pace_bms
+#    pace_bms_id: ${pace_bms_id}
+#    device_id: ${device_id}
+
+#    # (`type=MASTER` BMSes only)
+#    system_date_and_time:
+#      name: "System Date and Time"
+
+
+#button:
+#  - platform: pace_bms
+#    pace_bms_id: ${pace_bms_id}
+#    device_id: ${device_id}
+
+#    # (`type=MASTER` BMSes only)
+#    shutdown:
+#      # will actually "reboot" if the battery is charging/discharging
+#      #  - it only stays shut down if idle
+#      name: "Shutdown"
+  
+#select:
+#  - platform: pace_bms
+#    pace_bms_id: ${pace_bms_id}
+#    device_id: ${device_id}
+
+#    # setting the protocol is possible on some version 25 BMSes but not all
+#    # (`type=MASTER` BMSes only)
+#    protocol_can:
+#      name: "Protocol (CAN)"
+#    # (`type=MASTER` BMSes only)
+#    protocol_rs485:
+#      name: "Protocol (RS485)"
+#    # (`type=MASTER` BMSes only)
+#    protocol_type:
+#      name: "Protocol (Type)"
+

@@ -1,0 +1,189 @@
+sensor:
+  - platform: pace_bms
+    pace_bms_id: ${pace_bms_id}
+    device_id: ${device_id}
+
+    cell_count:
+      device_id: ${device_id}
+      name: "Cell Count"
+
+    cell_voltage_01:
+      device_id: ${device_id}
+      name: "Cell Voltage 01"
+    cell_voltage_02:
+      device_id: ${device_id}
+      name: "Cell Voltage 02"
+    cell_voltage_03:
+      device_id: ${device_id}
+      name: "Cell Voltage 03"
+    cell_voltage_04:
+      device_id: ${device_id}
+      name: "Cell Voltage 04"
+    cell_voltage_05:
+      device_id: ${device_id}
+      name: "Cell Voltage 05"
+    cell_voltage_06:
+      device_id: ${device_id}
+      name: "Cell Voltage 06"
+    cell_voltage_07:
+      device_id: ${device_id}
+      name: "Cell Voltage 07"
+    cell_voltage_08:
+      device_id: ${device_id}
+      name: "Cell Voltage 08" 
+    cell_voltage_09:
+      device_id: ${device_id}
+      name: "Cell Voltage 09"
+    cell_voltage_10:
+      device_id: ${device_id}
+      name: "Cell Voltage 10"
+    cell_voltage_11:
+      device_id: ${device_id}
+      name: "Cell Voltage 11"
+    cell_voltage_12:
+      device_id: ${device_id}
+      name: "Cell Voltage 12"
+    cell_voltage_13:
+      device_id: ${device_id}
+      name: "Cell Voltage 13"
+    cell_voltage_14:
+      device_id: ${device_id}
+      name: "Cell Voltage 14"
+    cell_voltage_15:
+      device_id: ${device_id}
+      name: "Cell Voltage 15"
+    cell_voltage_16:
+      device_id: ${device_id}
+      name: "Cell Voltage 16"
+
+    temperature_count:
+      device_id: ${device_id}
+      name: "Temperature Count"
+
+    # Generally the first four (or last four) temperatures are cell measurements and the other two are 
+    # MOSFET / Environment or Environment / MOSFET, but this is manufacturer specific
+    temperature_01:
+      device_id: ${device_id}
+      name: "Cell Temperature 1"
+    temperature_02:
+      device_id: ${device_id}
+      name: "Cell Temperature 2"
+    temperature_03:
+      device_id: ${device_id}
+      name: "Cell Temperature 3"
+    temperature_04:
+      device_id: ${device_id}
+      name: "Cell Temperature 4"
+    temperature_05:
+      device_id: ${device_id}
+      name: "MOSFET Temperature"
+    temperature_06:
+      device_id: ${device_id}
+      name: "Environment Temperature"
+
+    total_voltage:
+      device_id: ${device_id}
+      name: "Total Voltage"
+    current:
+      device_id: ${device_id}
+      name: "Current"
+    power:
+      device_id: ${device_id}
+      name: "Power"
+
+    remaining_capacity:
+      device_id: ${device_id}
+      name: "Remaining Capacity"
+    full_capacity:
+      device_id: ${device_id}
+      name: "Full Capacity"
+    design_capacity: # not available on EG4 protocol 0x20 variant
+      device_id: ${device_id}
+      name: "Design Capacity"
+
+    state_of_charge:
+      device_id: ${device_id}
+      name: "State of Charge"
+    state_of_health:
+      device_id: ${device_id}
+      name: "State of Health"
+    cycle_count:
+      device_id: ${device_id}
+      name: "Cycle Count"
+
+    min_cell_voltage:
+      device_id: ${device_id}
+      name: "Min Cell Voltage"
+    max_cell_voltage:
+      device_id: ${device_id}
+      name: "Max Cell Voltage"
+    avg_cell_voltage:
+      device_id: ${device_id}
+      name: "Avg Cell Voltage"
+    max_cell_differential:
+      device_id: ${device_id}
+      name: "Max Cell Differential"
+
+
+text_sensor:
+  - platform: pace_bms
+    pace_bms_id: ${pace_bms_id}
+    device_id: ${device_id}
+
+    # pre-decoded human readable text strings that describe all of the specific status values and are suitable for display
+    warning_status:
+      device_id: ${device_id}
+      name: "Warning Status"
+    protection_status:
+      device_id: ${device_id}
+      name: "Protection Status"
+    fault_status:
+      device_id: ${device_id}
+      name: "Fault Status"
+    system_status:
+      device_id: ${device_id}
+      name: "System Status"
+    configuration_status:
+      device_id: ${device_id}
+      name: "Configuration Status"
+    balancing_status:
+      device_id: ${device_id}
+      name: "Balancing Status"
+
+switch:
+  - platform: pace_bms
+    pace_bms_id: ${pace_bms_id}
+    device_id: ${device_id}
+
+    # (for `type=SLAVE` BMSes this will become read-only)
+    buzzer_alarm:
+      device_id: ${device_id}
+      name: "Buzzer Alarm"
+    # (for `type=SLAVE` BMSes this will become read-only)
+    led_alarm:
+      device_id: ${device_id}
+      name: "Led Alarm"
+    # (for `type=SLAVE` BMSes this will become read-only)
+    charge_current_limiter:
+      device_id: ${device_id}
+      name: "Charge Current Limiter"
+    # (for `type=SLAVE` BMSes this will become read-only)
+    charge_mosfet:
+      device_id: ${device_id}
+      name: "Charge Mosfet"
+    # (for `type=SLAVE` BMSes this will become read-only)
+    discharge_mosfet:
+      device_id: ${device_id}
+      name: "Discharge Mosfet"
+
+
+select:
+  - platform: pace_bms
+    pace_bms_id: ${pace_bms_id}
+    device_id: ${device_id}
+
+    # (for `type=SLAVE` BMSes this will become read-only)
+    charge_current_limiter_gear:
+      device_id: ${device_id}
+      name: "Charge Current Limiter Gear"
+
