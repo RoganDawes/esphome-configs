@@ -39,6 +39,7 @@ text_sensor:
     entity_category: diagnostic
 
   - platform: wifi_info
+    id: wifi_info_
     ip_address:
       name: "IP address"
       entity_category: diagnostic
@@ -57,6 +58,7 @@ sensor:
     entity_category: diagnostic
 
   - platform: wifi_signal
+    id: wifi_signal_
     name: "WiFi Signal"
     update_interval: 60s
     disabled_by_default: true
