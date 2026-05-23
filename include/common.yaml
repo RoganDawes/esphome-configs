@@ -7,8 +7,6 @@
 
 substitutions:
   public: false
-  private_overrides: !include private.yaml
-  public_overrides: !include public.yaml
   logger_level: INFO
 
 # Enable logging
@@ -74,4 +72,4 @@ button:
     entity_category: config
 
 packages:
-  - ${ public_overrides if public else private_overrides }
+  public: !include ${ "public.yaml" if public else "private.yaml" }
