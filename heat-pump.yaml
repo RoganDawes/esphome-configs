@@ -1,0 +1,51 @@
+substitutions:
+  logger_level: DEBUG
+
+esphome:
+  name: heat-pump
+  friendly_name: Heat Pump
+
+packages:
+  - !include include/common.yaml
+  - !include devices/weact_can485.yaml
+  - !include
+      file: include/its_heat_pump_modbus.yaml
+      vars:
+        modbus_controller_id: heat_pump_controller
+
+modbus_controller:
+  - id: heat_pump_controller
+    address: 0x01
+    modbus_id: modbus_485
+    setup_priority: -10
+    update_interval: "15s"
+    command_throttle: "50ms"
+
+water_heater:
+  - platform: template
+    name: None
+    id: water_heater_
+
+    current_temperature: !lambda 'return id(tank_temp).state;'
+    target_temperature: !lambda 'return id(target_temp).state;'
+
+    is_on: !lambda 'return id(power).state;'
+
+    optimistic: true
+
+    supported_modes:
+      - "OFF"
+      - "ECO"
+
+    visual:
+      min_temperature: 20
+      max_temperature: 60
+      target_temperature_step: 1
+
+    set_action:
+      - lambda: |-
+          ESP_LOGI("heat_pump", "New mode: %d", id(water_heater_).get_mode());
+          ESP_LOGI("heat_pump", "New target temperature: %.1f", id(water_heater_).get_target_temperature());
+          ESP_LOGI("heat_pump", "On: %s, Away: %s", YESNO(id(water_heater_).is_on()), YESNO(id(water_heater_).is_away()));
+
+
