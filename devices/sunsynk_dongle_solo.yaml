@@ -1,0 +1,28 @@
+esp32:
+  framework:
+    type: esp-idf
+    sdkconfig_options:
+      CONFIG_FREERTOS_UNICORE: y
+  variant: esp32
+
+logger:
+
+uart:
+  - id: mod_bus
+    tx_pin: GPIO0
+    rx_pin: GPIO4
+    baud_rate: 9600
+ 
+output:
+  - platform: gpio
+    pin: GPIO33
+    id: red_led
+
+  - platform: gpio
+    pin: GPIO23
+    id: green_led
+
+light:
+  - platform: status_led
+    id: status_
+    output: green_led
