@@ -16,7 +16,7 @@ sensor:
     name: "Error Code"
     id: error_raw
     register_type: holding
-    address: 34
+    address: 33
     value_type: U_WORD
     entity_category: diagnostic
 
@@ -25,7 +25,7 @@ sensor:
     name: "Electronic Expansion Valve Position"
     id: eev_pos
     register_type: holding
-    address: 69
+    address: 68
     value_type: U_WORD
     unit_of_measurement: ""
     state_class: measurement
@@ -34,35 +34,35 @@ sensor:
   - <<: *common_temp
     name: "Compressor Coil Temperature"
     id: coil_temp
-    address: 70
+    address: 69
     entity_category: diagnostic
 
   - <<: *common_temp
     name: "Ambient Temperature"
     id: ambient_temp
-    address: 71
+    address: 70
 
   - <<: *common_temp
     name: "Compressor Suction Temperature"
     id: compressor_suction_temp
-    address: 72
+    address: 71
     entity_category: diagnostic
 
   - <<: *common_temp
     name: "Compressor Outlet Temperature"
     id: compressor_outlet_temp
-    address: 73
+    address: 72
     entity_category: diagnostic
 
   - <<: *common_temp
     name: "Tank Temperature"
     id: tank_temp
-    address: 74
+    address: 73
 
   - <<: *common_temp
     name: "Outlet Water Temperature"
     id: outlet_temp
-    address: 75
+    address: 74
     entity_category: diagnostic
 
 binary_sensor:
@@ -71,14 +71,14 @@ binary_sensor:
     name: "Compressor run"
     id: compressor_run
     register_type: holding
-    address: 76
+    address: 75
     
   - platform: modbus_controller
     modbus_controller_id: ${modbus_controller_id}
     name: "Fan run"
     id: fan_run
     register_type: holding
-    address: 78
+    address: 77
     entity_category: diagnostic
     
   - platform: modbus_controller
@@ -86,7 +86,7 @@ binary_sensor:
     name: "Pump run"
     id: pump_run
     register_type: holding
-    address: 80
+    address: 79
     entity_category: diagnostic
     
 switch:
@@ -96,7 +96,7 @@ switch:
     name: "Power"
     id: power
     register_type: holding
-    address: 774
+    address: 773
     bitmask: 1
 
 number:
@@ -107,7 +107,7 @@ number:
     value_type: U_WORD
     id: target_temp
     name: "Target Temp"
-    address: 770
+    address: 769
     min_value: 20
     max_value: 60
     step: 1

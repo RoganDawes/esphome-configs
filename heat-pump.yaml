@@ -1,5 +1,5 @@
 substitutions:
-  logger_level: DEBUG
+  logger_level: INFO
 
 esphome:
   name: heat-pump
@@ -21,6 +21,9 @@ modbus_controller:
     update_interval: "15s"
     command_throttle: "50ms"
 
+logger:
+  level: ${logger_level}
+
 water_heater:
   - platform: template
     name: None
@@ -28,6 +31,9 @@ water_heater:
 
     current_temperature: !lambda 'return id(tank_temp).state;'
     target_temperature: !lambda 'return id(target_temp).state;'
+
+    # Lambda to read the current operation mode (optional)
+    mode: !lambda 'return water_heater::WATER_HEATER_MODE_ECO;'
 
     is_on: !lambda 'return id(power).state;'
 
@@ -47,5 +53,8 @@ water_heater:
           ESP_LOGI("heat_pump", "New mode: %d", id(water_heater_).get_mode());
           ESP_LOGI("heat_pump", "New target temperature: %.1f", id(water_heater_).get_target_temperature());
           ESP_LOGI("heat_pump", "On: %s, Away: %s", YESNO(id(water_heater_).is_on()), YESNO(id(water_heater_).is_away()));
-
+          auto call = id(target_temp).make_call();
+          call.set_value(id(water_heater_).get_target_temperature());
+          call.perform();
+          id(power).control(id(water_heater_).get_mode() != water_heater::WATER_HEATER_MODE_OFF);
 
