@@ -1,0 +1,8 @@
+esphome:
+  name: rogan-garage
+  friendly_name: "Rogan's Garage"
+
+packages:
+  device: !include devices/dforce-1500gd.yaml
+  common: !include include/common.yaml
+
