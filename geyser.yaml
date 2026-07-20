@@ -176,7 +176,7 @@ climate:
           lambda: |-
             auto mode = x.get_mode();
             if (mode.has_value() && mode.value() != CLIMATE_MODE_OFF) {
-              ESP_LOGI("lambda", "set_mode(%s) ignored because master switch is off", climate_mode_to_string(mode.value()));
+              ESP_LOGI("lambda", "set_mode(%s) ignored because master switch is off", LOG_STR_ARG(climate_mode_to_string(mode.value())));
               x.set_mode(CLIMATE_MODE_OFF);
             }
 
