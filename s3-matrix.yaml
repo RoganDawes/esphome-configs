@@ -90,5 +90,5 @@ display:
       // Clear the display with black (optional, prevents smearing)
       it.fill(id(my_orange_color));
 
-      it.line(1, 7, 7, 7, id(my_white_color));
+      it.line(1, 7, 6, 7, id(my_white_color));
     rotation: "180"
