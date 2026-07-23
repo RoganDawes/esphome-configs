@@ -4,7 +4,7 @@ esphome:
 
 # Replace this with your actual platform if you aren't using ESP32.
 esp32:
-  board: esp32dev
+  variant: ESP32S3
 
 logger:
 
@@ -23,3 +23,17 @@ wifi:
     password: "bQAOdgyexMju"
 
 captive_portal:
+
+light:
+  - platform: esp32_rmt_led_strip
+    name: matrix
+    pin: GPIO14
+    id: light_esp32_rmt_led_strip_1
+    chipset: WS2812
+    num_leds: 64
+    rgb_order: RGB
+
+i2c:
+  - scl: GPIO12
+    sda: GPIO11
+    id: i2c_1
