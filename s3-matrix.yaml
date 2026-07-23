@@ -96,3 +96,7 @@ display:
 external_components:
   - source: github://stuartparmenter/games-esphome
     components: [lvgl_game_runner, game_snake, game_breakout, game_pong]
+
+lvgl:
+
+  
