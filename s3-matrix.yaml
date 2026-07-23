@@ -88,4 +88,4 @@ display:
       it.rectangle(0, 0, 8, 8, id(my_red_color));
 
       // Draw a filled circle (center_x, center_y, radius, color)
-      it.filled_circle(4, 4, 3, id(my_blue_color));
+      it.filled_circle(4, 4, 2.5, id(my_blue_color));
