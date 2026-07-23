@@ -86,17 +86,16 @@ display:
     width: 8
     height: 8
     addressable_light_id: matrix
-    lambda: |-
-      // Clear the display with black (optional, prevents smearing)
-      it.fill(id(my_orange_color));
-
-      it.line(1, 6, 6, 6, id(my_white_color));
-    rotation: "180"
+#    lambda: |-
+#      // Clear the display with black (optional, prevents smearing)
+#      it.fill(id(my_orange_color));
+#
+#      it.line(1, 6, 6, 6, id(my_white_color));
+#    rotation: "180"
 
 external_components:
   - source: github://stuartparmenter/games-esphome
     components: [lvgl_game_runner, game_snake, game_breakout, game_pong]
 
 lvgl:
-
-  
+  rotation: 180
