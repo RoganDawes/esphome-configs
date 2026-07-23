@@ -88,9 +88,11 @@ display:
     addressable_light_id: matrix
     lambda: |-
       // Clear the display with black (optional, prevents smearing)
-      it.fill(id(my_orange_color));
+      // it.fill(id(my_orange_color));
 
-      it.line(1, 7, 7, 7, id(my_white_color));
+      it.line(0, 0, 3, 3, id(my_white_color));
+      it.line(7, 7, 4, 4, id(my_red_color));
+      it.line(0, 7, 3, 4, id(my_blue_color));
 
       // Draw a filled circle (center_x, center_y, radius, color)
       // it.filled_circle(4, 4, 2.5, id(my_blue_color));
