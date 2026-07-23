@@ -37,3 +37,23 @@ i2c:
   - scl: GPIO12
     sda: GPIO11
     id: i2c_1
+
+motion:
+  - platform: qmi8658
+    accelerometer_range: 4G
+    gyroscope_range: 2048DPS
+
+sensor:
+  - platform: motion
+    type: acceleration_x
+    name: "QMI8658 Accel X"
+  - platform: motion
+    type: gyroscope_x
+    name: "QMI8658 Gyro X"
+  - platform: motion
+    type: roll
+    name: "QMI8658 Roll"
+
+  - platform: qmi8658
+    type: temperature # Optional, temperature is the only supported type for this platform
+    name: "QMI8658 Temperature"
