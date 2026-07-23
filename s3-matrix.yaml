@@ -1,0 +1,25 @@
+esphome:
+  name: s3-matrix
+  friendly_name: s3-matrix
+
+# Replace this with your actual platform if you aren't using ESP32.
+esp32:
+  board: esp32dev
+
+logger:
+
+api:
+  encryption:
+    key: "9MAKzQO87EyrBlGsBG9lj4xoF8B1mFUgxbVsq+3s4x4="
+
+ota:
+  - platform: esphome
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: s3-matrix Fallback Hotspot
+    password: "bQAOdgyexMju"
+
+captive_portal:
