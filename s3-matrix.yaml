@@ -98,4 +98,28 @@ external_components:
     components: [lvgl_game_runner, game_snake, game_breakout, game_pong]
 
 lvgl:
-  rotation: 180
+  displays:
+    - led_display
+#        rotation: 180
+      
+  # Define the canvas for game rendering
+  pages:
+    - id: game_page
+      widgets:
+        - canvas:
+            id: game_canvas
+            width: 8
+            height: 8
+            bg_color: 0x000000
+
+# 1. Declare game components first
+game_snake:
+  id: snake
+
+# 2. Configure the game runner
+lvgl_game_runner:
+  id: snake_game
+  initial_game: snake
+  canvas: game_canvas
+  fps: 30
+  start_paused: false
