@@ -63,27 +63,22 @@ color:
     red: 100%
     green: 0%
     blue: 0%
-    white: 0%
   - id: my_black_color
     red: 0%
     green: 0%
     blue: 0%
-    white: 0%
   - id: my_blue_color
     red: 0%
     green: 0%
     blue: 100%
-    white: 0%
   - id: my_orange_color
     red_int: 255
     green_int: 165
     blue_int: 0
-    white: 0
   - id: my_white_color
-    red_int: 0
-    green_int: 0
-    blue_int: 0
-    white: 50%
+    red: 100%
+    green: 100%
+    blue: 100%
     
 display:
   - platform: addressable_light
