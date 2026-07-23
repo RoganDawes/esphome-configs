@@ -92,3 +92,7 @@ display:
 
       it.line(1, 6, 6, 6, id(my_white_color));
     rotation: "180"
+
+external_components:
+  - source: github://stuartparmenter/games-esphome
+    components: [lvgl_game_runner, game_snake, game_breakout, game_pong]
