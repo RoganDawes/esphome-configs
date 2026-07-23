@@ -26,9 +26,8 @@ captive_portal:
 
 light:
   - platform: esp32_rmt_led_strip
-    name: matrix
+    id: matrix
     pin: GPIO14
-    id: light_esp32_rmt_led_strip_1
     chipset: WS2812
     num_leds: 64
     rgb_order: RGB
@@ -57,3 +56,36 @@ sensor:
   - platform: qmi8658
     type: temperature # Optional, temperature is the only supported type for this platform
     name: "QMI8658 Temperature"
+
+color:
+  - id: my_red_color
+    red: 100%
+    green: 0%
+    blue: 0%
+    white: 0%
+  - id: my_black_color
+    red: 0%
+    green: 0%
+    blue: 0%
+    white: 0%
+  - id: my_blue_color
+    red: 0%
+    green: 0%
+    blue: 100%
+    white: 0%
+    
+display:
+  - platform: addressable_light
+    id: led_display
+    width: 8
+    height: 8
+    addressable_light_id: matrix
+    lambda: |-
+      // Clear the display with black (optional, prevents smearing)
+      it.fill(id(my_black_color));
+
+      // Draw a hollow rectangle (x, y, width, height, color)
+      it.rectangle(0, 0, 8, 8, id(my_red_color));
+
+      // Draw a filled circle (center_x, center_y, radius, color)
+      it.filled_circle(4, 4, 3, id(my_blue_color));
