@@ -167,18 +167,6 @@ climate:
         then:
           - logger.log: "Climate control ON"
           - light.turn_on: green_led
-    on_control:
-    - if:
-        condition:
-          lambda: |-
-            return !id(master_switch).state;
-        then:
-          lambda: |-
-            auto mode = x.get_mode();
-            if (mode.has_value() && mode.value() != CLIMATE_MODE_OFF) {
-              ESP_LOGI("lambda", "set_mode(%s) ignored because master switch is off", LOG_STR_ARG(climate_mode_to_string(mode.value())));
-              x.set_mode(CLIMATE_MODE_OFF);
-            }
 
 script:
   - id: geyser_on
