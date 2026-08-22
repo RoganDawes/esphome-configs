@@ -11,8 +11,3 @@ esphome:
 packages:
   common: !include include/common.yaml
   dimmer: !include devices/tuya_dimmer.yaml
-
-bk72xx_ble_tracker:
-
-bluetooth_proxy:
-  
