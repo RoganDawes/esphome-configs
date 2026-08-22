@@ -6,6 +6,10 @@ packages:
   common: !include include/common.yaml
   connex: !include devices/connex-plug.yaml
 
+bk72xx_ble_tracker:
+
+bluetooth_proxy:
+  
 binary_sensor:
   - platform: template
     name: "Running"
