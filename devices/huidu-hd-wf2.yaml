@@ -1,0 +1,48 @@
+esphome:
+  platformio_options:
+    board_build.flash_mode: dio
+
+esp32:
+  variant: esp32s3
+
+i2c:
+  sda: GPIO41
+  scl: GPIO42
+
+time:
+  - platform: pcf8563
+    address: 0x51
+    id: pcf8563_time
+
+display:
+  - platform: hub75
+    id: matrix
+    board: huidu-hd-wf2
+
+output:
+  - platform: gpio
+    id: output_run
+    pin: GPIO40
+
+binary_sensor:
+  - platform: gpio
+    id: test_key
+    pin:
+      number: GPIO17
+      inverted: true
+
+number:
+  - platform: template
+    id: display_brightness
+    name: Brightness
+    min_value: 0
+    max_value: 255
+    step: 1
+    initial_value: 2
+    restore_value: true
+    optimistic: true
+    set_action:
+      then:
+        - lambda: |-
+            id(matrix).set_brightness(x);
+

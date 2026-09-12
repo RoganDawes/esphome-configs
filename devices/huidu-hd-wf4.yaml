@@ -1,0 +1,74 @@
+# NOTE: GPIO0 on its own seems insufficient to trigger serial boot mode
+# Bridge P2 with a jumper, as well as S4, before applying power to
+# reliably enter serial boot mode.
+#
+# Indicator that this is required is when a UART on TX0 shows either
+# SPI_FLASH_BOOT or SPI_FAST_FLASH_BOOT, depending on GPIO0, rather than
+# rst:0x15 (USB_UART_CHIP_RESET),boot:0x0 (DOWNLOAD(USB/UART0))
+#
+# It's possible that the weak pull-up on S4 was burned out while trying to probe
+# the boards pinout.
+
+# See https://gitlab.alcaravan.com.ve/vmaldonado/KitEducativo/-/blob/main/variants/huidu_hd_wf4/pins_arduino.h
+
+substitutions:
+  P1_RX0: GPIO44
+  P1_TX0: GPIO43
+  P2: GPIO0
+  P5_TEMP: GPIO16
+  P7: GPIO1
+  P11_IR: GPIO15
+  P12_TX1: GPIO18
+  P12_RX1: GPIO47
+  S1: GPIO17
+  S2: GPIO48
+  S3: GPIO26
+  S4: GPIO46
+  RUN: GPIO40
+
+esp32:
+  variant: esp32s3
+
+i2c:
+  - id: i2c_time
+    sda: GPIO41
+    scl: GPIO42
+
+time:
+  - platform: pcf8563
+    id: pcf8563_time
+    i2c_id: i2c_time
+    address: 0x51
+
+display:
+  - platform: hub75
+    id: matrix
+    board: huidu-hd-wf2
+
+output:
+  - platform: gpio
+    id: output_run
+    pin: ${RUN}
+
+binary_sensor:
+  - platform: gpio
+    id: test_key
+    pin:
+      number: ${S1}
+      inverted: true
+
+number:
+  - platform: template
+    id: display_brightness
+    name: Brightness
+    min_value: 0
+    max_value: 255
+    step: 1
+    initial_value: 2
+    restore_value: true
+    optimistic: true
+    set_action:
+      then:
+        - lambda: |-
+            id(matrix).set_brightness(x);
+
