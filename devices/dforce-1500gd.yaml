@@ -3,8 +3,8 @@ packages:
 
 binary_sensor:
     # We don't need the binary sensors, we only use PWM/duty cycle
-  - id: !delete motor_a
-  - id: !delete motor_b
+  - id: !remove motor_a
+  - id: !remove motor_b
 
   # Movement sensors trigger when one motor is at 100%, and the other has dropped to below 80% after initial acceleration
   - platform: template
