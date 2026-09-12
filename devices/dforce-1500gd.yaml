@@ -1,44 +1,64 @@
 packages:
   device: !include motor_supervisor_v1.yaml
 
-select:
-  - platform: template
-    id: cover_state
-    options:
-      - CLOSING_STOPPED
-      - OPENING
-      - OPENING_STOPPED
-      - CLOSING
-    optimistic: true
- 
 binary_sensor:
-    # when the door starts moving, one motor sensor goes straight to ON
-    # while the other uses PWM. The "delayed_on" filter turns one
-    # _movement sensor below on within 100ms, while the other stays off
-  - id: !extend motor_a
-    filters:
-      - delayed_on: 100ms
+    # We don't need the binary sensors, we only use PWM/duty cycle
+  - id: !delete motor_a
+  - id: !delete motor_b
 
-  - id: !extend motor_b
-    filters:
-      - delayed_on: 100ms
-
+  # Movement sensors trigger when one motor is at 100%, and the other has dropped to below 80% after initial acceleration
   - platform: template
     id: open_movement
-    lambda: |-
-      return (id(motor_b).state && !id(close_movement).state);
+    condition:
+      and:
+        - sensor.in_range:
+            id: motor_a_duty_cycle
+            above: 20.0
+            below: 81.0
+        - sensor.in_range:
+            id: motor_b_duty_cycle
+            above: 99.0
+    filters:
+      - delayed_on: 100ms # Don't trigger during the acceleration ramp up to 100%
+      - delayed_off: 2s   # Remain on during the deceleration ramp, to turn the endstop on
 
   - platform: template
     id: close_movement
-    lambda: |-
-      return (id(motor_a).state && !id(open_movement).state);
+    condition:
+      and:
+        - sensor.in_range:
+            id: motor_a_duty_cycle
+            above: 99.0
+        - sensor.in_range:
+            id: motor_b_duty_cycle
+            above: 20.0
+            below: 81.0
+    filters:
+      - delayed_on: 100ms # Don't trigger during the acceleration ramp up to 100%
+      - delayed_off: 2s   # Remain on during the deceleration ramp, to turn the endstop on
 
-  # The endstop sensors are updated from the duty_cycle sensors below
+  # The endstop sensors depend on the currently detected movement, and the deceleration spike to above 80%
   - platform: template
     id: open_endstop
+    condition:
+      - and:
+        - binary_sensor.is_on: open_movement
+        - sensor.in_range:
+            id: motor_a_duty_cycle
+            above: 80.0
+    filters:
+      - delayed_off: 3s
 
   - platform: template
     id: close_endstop
+    condition:
+      and:
+        - binary_sensor.is_on: close_movement
+        - sensor.in_range:
+            id: motor_b_duty_cycle
+            above: 80.0
+    filters:
+      - delayed_off: 3s
 
 sensor:
   # By observation of the duty_cycle values for motor_a and motor_b, it can be observed that
@@ -51,45 +71,13 @@ sensor:
 
   - id: !extend motor_a_duty_cycle
     filters:
-      - round_to_multiple_of: 10
-      - delta: 10
-    on_value:
-      then:
-        - lambda: |-
-            if (id(motor_b_duty_cycle).state == 100 && x > 20 && x < 80
-              && id(cover_state).current_option() != "OPENING") {
-                auto call = id(cover_state).make_call();
-                call.set_option("OPENING");
-                call.perform();
-                id(close_endstop).publish_state(false);
-            } else if (id(cover_state).current_option() == "OPENING" && x >= 80) {
-              id(open_endstop).publish_state(true); // deceleration to endstop
-            } else if (x == 0 && id(cover_state).current_option() == "OPENING") {
-              auto call = id(cover_state).make_call();
-              call.set_option("OPENING_STOPPED");
-              call.perform();
-            }
+      - round_to_multiple_of: 5
+      - delta: 1
 
   - id: !extend motor_b_duty_cycle
     filters:
-      - round_to_multiple_of: 10
-      - delta: 10
-    on_value:
-      then:
-        - lambda: |-
-            if (id(motor_a_duty_cycle).state == 100 && x > 20 && x < 80
-              && id(cover_state).current_option() != "CLOSING") {
-                auto call = id(cover_state).make_call();
-                call.set_option("CLOSING");
-                call.perform();
-                id(open_endstop).publish_state(false);
-            } else if (id(cover_state).current_option() == "CLOSING" && x >= 80) {
-              id(close_endstop).publish_state(true); // deceleration to endstop
-            } else if (x == 0 && id(cover_state).current_option() == "CLOSING") {
-              auto call = id(cover_state).make_call();
-              call.set_option("CLOSING_STOPPED");
-              call.perform();
-            }
+      - round_to_multiple_of: 5
+      - delta: 1
 
 button:
   - platform: output
@@ -104,7 +92,7 @@ button:
 # miserably. Feels like it needs to be integrated into the cover somehow
 # since there is already a "cover.toggle()" method, it clearly knows its
 # own state, even if it is not exposed. Exposing it is probably the first
-# step, and will remove need for the "cover_state" select!
+# step.
 cover:
   - platform: feedback
     id: cover_
