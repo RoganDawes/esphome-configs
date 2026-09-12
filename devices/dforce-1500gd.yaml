@@ -70,11 +70,15 @@ sensor:
   # The filters were added after the fact to reduce log verbosity and simplify comparisons.
 
   - id: !extend motor_a_duty_cycle
+    pin:
+      allow_other_uses: False
     filters:
       - round_to_multiple_of: 5
       - delta: 1
 
   - id: !extend motor_b_duty_cycle
+    pin:
+      allow_other_uses: False
     filters:
       - round_to_multiple_of: 5
       - delta: 1
